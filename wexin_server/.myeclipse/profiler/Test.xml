@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<entry key="app_preset_prof_preset_name">Test Launch Configuration</entry>
+<entry key="app_preset_prof_preset_filter_s"/>
+<entry key="app_preset_prof_preset_filter_p">com.cloopen.rest.sdk.*,
+com.jfinal.weixin.sdk.msg.in.*,
+com.jws.app.operater.control.*,
+com.jws.app.operater.data.*,
+com.jws.app.operater.model.*,
+com.jws.app.operater.service.*,
+com.jws.common.bean.*,
+com.jws.common.constant.*,
+com.jws.common.data.*,
+com.jws.common.exception.*,
+com.jws.common.service.*,
+com.jws.common.util.*,
+com.jws.common.web.response.*,
+org.gzk.image.junit.*,
+org.gzk.pay.weixin.control.*,
+org.gzk.weixin.accessToken.*,
+org.gzk.weixin.cache.*,
+org.gzk.weixin.control.*,
+org.gzk.weixin.hand.*,
+org.gzk.weixin.service.impl.*,
+org.gzk.weixin.thread.*,
+org.gzk.weixin.timetask.*,
+org.rwl.pay.weixin.manager.*,
+org.rwl.pay.weixin.servlet.*,
+org.rwl.pay.weixin.utils.*,
+yuntongxun.sms.sdk.control.*,
+yuntongxun.sms.sdk.service.*</entry>
+<entry key="app_preset_prof_preset_alloc_p">10</entry>
+<entry key="app_preset_"/>
+<entry key="app_preset_prof_preset_samplingRefreshRate_s">1000</entry>
+<entry key="app_preset_prof_preset_stacks_p">false</entry>
+<entry key="app_preset_prof_preset_roots_p">com.cloopen.rest.sdk.**
+com.jfinal.weixin.sdk.msg.in.**
+com.jws.app.operater.control.**
+com.jws.app.operater.data.**
+com.jws.app.operater.model.**
+com.jws.app.operater.service.**
+com.jws.common.bean.**
+com.jws.common.constant.**
+com.jws.common.data.**
+com.jws.common.exception.**
+com.jws.common.service.**
+com.jws.common.util.**
+com.jws.common.web.response.**
+org.gzk.image.junit.**
+org.gzk.pay.weixin.control.**
+org.gzk.weixin.accessToken.**
+org.gzk.weixin.cache.**
+org.gzk.weixin.control.**
+org.gzk.weixin.hand.**
+org.gzk.weixin.service.impl.**
+org.gzk.weixin.thread.**
+org.gzk.weixin.timetask.**
+org.rwl.pay.weixin.manager.**
+org.rwl.pay.weixin.servlet.**
+org.rwl.pay.weixin.utils.**
+yuntongxun.sms.sdk.control.**
+yuntongxun.sms.sdk.service.**
+</entry>
+<entry key="profiler.settings.instrument.empty.methods">false</entry>
+<entry key="myeclipse.profiling.mode">0</entry>
+<entry key="profiler.settings.istrument.getter.setter.methods">false</entry>
+<entry key="app_preset_prof_preset_samplingRate_s">100</entry>
+<entry key="app_preset_prof_preset_filterMode_s">true</entry>
+<entry key="app_preset_prof_preset_selector"/>
+<entry key="app_preset_prof_preset_refreshRate_s">1000</entry>
+<entry key="app_preset_prof_preset_runnables_p">true</entry>
+<entry key="app_preset_prof_preset_filterMode_p">false</entry>
+<entry key="app_preset_prof_preset_memoryMode_p">true</entry>
+</properties>

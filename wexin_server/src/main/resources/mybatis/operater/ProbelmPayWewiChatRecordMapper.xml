@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jws.app.operater.data.ProbelmPayWewiChatRecordMapper" >
+  <resultMap id="BaseResultMap" type="com.jws.app.operater.model.ProbelmPayWewiChatRecord" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="payment_id" property="paymentId" jdbcType="VARCHAR" />
+    <result column="amount_money" property="amountMoney" jdbcType="INTEGER" />
+    <result column="payment_info" property="paymentInfo" jdbcType="VARCHAR" />
+    <result column="payment_status" property="paymentStatus" jdbcType="INTEGER" />
+    <result column="spare_field1" property="spareField1" jdbcType="VARCHAR" />
+    <result column="spare_field2" property="spareField2" jdbcType="VARCHAR" />
+    <result column="spare_field3" property="spareField3" jdbcType="VARCHAR" />
+    <result column="spare_field4" property="spareField4" jdbcType="VARCHAR" />
+    <result column="spare_field5" property="spareField5" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+
+  <insert id="insert" parameterType="com.jws.app.operater.model.ProbelmPayWewiChatRecord" >
+    insert into tb_paymentmoney_weixin (id, payment_id, amount_money, 
+      payment_info, payment_status, spare_field1, 
+      spare_field2, spare_field3, spare_field4, 
+      spare_field5, create_time)
+    values (#{id,jdbcType=INTEGER}, #{paymentId,jdbcType=VARCHAR}, #{amountMoney,jdbcType=INTEGER}, 
+      #{paymentInfo,jdbcType=VARCHAR}, #{paymentStatus,jdbcType=INTEGER}, #{spareField1,jdbcType=VARCHAR}, 
+      #{spareField2,jdbcType=VARCHAR}, #{spareField3,jdbcType=VARCHAR}, #{spareField4,jdbcType=VARCHAR}, 
+      #{spareField5,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+  
+       <select id="queryWeiChatBalance" resultMap="BaseResultMap"  parameterType="map">			
+			SELECT * FROM tb_paymentmoney_weixin WHERE spare_field3 = #{openid,jdbcType=VARCHAR} AND spare_field4 IS  NULL
+  </select>
+</mapper>

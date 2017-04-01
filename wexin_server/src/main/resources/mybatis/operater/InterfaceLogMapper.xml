@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jws.app.operater.data.InterfaceLogMapper" >
+  <resultMap id="BaseResultMap" type="com.jws.app.operater.model.InterfaceLog" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="source" property="source" jdbcType="VARCHAR" />
+    <result column="inputobject" property="inputobject" jdbcType="VARCHAR" />
+    <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+   <resultMap id="ResultMapWithBLOBs" type="com.jws.app.operater.model.InterfaceLog" extends="BaseResultMap" >
+    <result column="returnobject" property="returnobject" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <insert id="insert" parameterType="com.jws.app.operater.model.InterfaceLog" >
+    insert into tb_interface_log (id, source, inputobject, 
+      created_time, update_time, returnobject
+      )
+    values (#{id,jdbcType=INTEGER}, #{source,jdbcType=VARCHAR}, #{inputobject,jdbcType=VARCHAR}, 
+		now(), #{updateTime,jdbcType=TIMESTAMP}, #{returnobject,jdbcType=LONGVARCHAR}
+      )
+  </insert>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.jws.app.operater.model.InterfaceLog" >
+    update tb_interface_log
+    set       
+      update_time = now(),
+      returnobject = #{returnobject,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -1,0 +1,11 @@
+.center {
+	top: 50%;
+	left: 50%;
+	width: 500px;
+	height: 400px;
+	margin: -200px 0 0 -250px; /*容器在浏览器窗口中水平垂直居中*/
+	position: absolute;
+	vertical-align: middle; /*文字在父容器中垂直居中无效*/
+	text-align: center; /* 文字在父容器中水平居中 */
+	border: 0px;
+}

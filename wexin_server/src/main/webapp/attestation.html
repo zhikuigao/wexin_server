@@ -1,0 +1,182 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="renderer" content="webkit">
+
+<meta name="format-detection" content="telephone=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<script type="text/javascript" src="/weixin/js/adaptive.js"></script>
+
+<link rel="stylesheet" type="text/css" href="/weixin/css/style.css"/>
+<script type="text/javascript" src="/weixin/js/jquery.min.js"></script>
+<script type="text/javascript" src="/weixin/js/fastclick.js"></script>
+<script type="text/javascript" src="/weixin/js/common.js"></script>
+<script type="text/javascript" src="/weixin/plugins/layer/layer.js"></script>
+
+<title>创伙伴·帮忙</title>
+</head>
+<body>
+<div class="body-wrap attestation-page">
+	<div class="g-progress no-last size54 disEditAbled">
+		<div class="progress-item active">
+			<span class="circle">
+				<span class="icon icon5"></span>
+			</span>
+			<div class="word txtl">提交资料</div>
+		</div>
+		<div class="progress-item">
+			<span class="circle">
+				<span class="icon icon6"></span>
+			</span>
+			<div class="word txtc">审核中</div>
+		</div>
+		<div class="progress-item">
+			<span class="circle">
+				<span class="icon icon4"></span>
+			</span>
+			<div class="word txtr">审核成功</div>
+		</div>
+	</div>
+	<form id="imgForm"  method="post" enctype="multipart/form-data">
+		<div class="file-upload">
+			<div class="status-w"></div>
+			<input type="hidden" name="busiCode" id="busiCode" value="uploadPhoto">
+			<input type="hidden" name="openid" id="openid" value="">
+			<div class="img-wrap">
+				<input type="file" name="file" id="fileUpload" value="" class="img-input" >
+				<div id="preview"><img src="images/no-img.jpg" alt=""></div>
+			</div>
+			<div class="upload-progress"></div>
+			<span class="tips">请上传你的名片或工牌进行认证</span>
+		</div>
+		<div class="fix-btn">
+			<div class="fix-wrap">
+				<a href="person-info-form.html" class="fix-btn-item btn-highlight w50">取消</a>
+				<div id="upload-btn" class="fix-btn-item btn-highlight w50">提交认证</div>
+			</div>
+		</div>
+	</form>
+</div>
+
+<script type='text/javascript' src='js/jquery.form.js'></script>
+<script type="text/javascript">
+$(function(){
+	var app = {
+		status:0,
+		img:"",
+		openid:openid,
+		userInfo:function(data){
+			console.log(data);
+			if(!data)return false;
+			app.status = data.spareField1;
+			app.img = data.spareField3;
+
+
+			if(app.status>0){
+				$("#preview").html('<img src='+app.img+' alt="">');
+			}
+
+			if(app.status>0){
+				/*在审核以后的状态就不允许进行其他修改*/
+				$("[type=file]").attr("disabled",true);
+				return false;
+			}
+		},
+		uploadInit:function(){
+			$("#fileUpload").on("change",function(){
+				var file = this.files[0];
+				      name = file.name;
+				      size = file.size;
+				      type = file.type;
+				var url = window.URL.createObjectURL(file);
+				console.log(url);
+				var r = new FileReader();
+				r.readAsDataURL(file); 
+				$(r).load(function(){
+					var attstr= '<img src="'+this.result+'">'; 
+					$("#preview").html(attstr);
+					app.img = this.result;
+				});
+			});
+		},
+		statusBar:function(){
+			var num = 0;
+			var statusW = "";
+			var tips = "";
+			switch(parseInt(app.status)){
+				case 0:
+					num=0;
+					statusW = "你提交的资料不符合要求<br>请重新提交认证！";
+					break;
+				case 1:
+					$(".fix-btn").hide();
+					num=1;
+					statusW = "你提交的资料<br>正在审核中，请耐心等待！";
+					tips = "";
+					break;
+				case 2:
+					num=2;
+					$(".fix-btn").hide();
+					statusW = "感谢你提供的资料<br>认证成功！";
+					break;
+				
+				default:
+					num=0;
+					statusW = "";
+					tips = "请上传你的名片或工牌进行认证";
+			}
+			$(".progress-item").removeClass("active");
+			$(".progress-item:lt("+(parseInt(num)+1)+")").addClass("active");
+			$(".status-w").html(statusW);
+			$(".tips").html(tips);
+		},
+		eventBind:function(){
+			$("#upload-btn").on("click",function(e){
+				$("#imgForm").ajaxSubmit({  
+		            url : "http://120.24.7.124/weixin/entry/interfaceEntryForStream.do?paramObjec",  
+                    type : "post",  
+                    dataType : 'json',  
+                    success : function(data) {  
+                    	if(data.result.code==1){
+                    		/*app.status = 1;
+                    		app.img = $("#preview img").attr("src");*/
+                    		alert("审核提交成功",function(){
+                    			window.location.reload();
+                    		});
+
+                    	}
+                    },  
+                    error : function(data) {  
+                        console.log("error:" + data.responseText);  
+                    } 
+		        });  
+			});
+		},
+		progressHandlingFunction:function(e){
+			if (e.lengthComputable) {
+				$('progress').attr({value : e.loaded, max : e.total}); //更新数据到进度条
+				var percent = e.loaded/e.total*100;
+				$('#progress').html(e.loaded + "/" + e.total+" bytes. " + percent.toFixed(2) + "%");
+			}
+		},
+		init:function(){
+			this.userInfo(getUserInfo(app.openid));
+
+			this.statusBar();
+
+			if(!this.status||this.status < 1){
+				this.uploadInit();
+			}
+			$("#openid").val(app.openid);
+			this.eventBind();
+			
+		}
+	}
+	app.init();
+});
+</script>
+</body>
+</html>

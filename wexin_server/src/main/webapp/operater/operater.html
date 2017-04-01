@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE8"
+	content="ie=edge" />
+<meta charset="UTF-8">
+<link rel="stylesheet" type="text/css"
+	href="../common/widget/jquery/themes/default/easyui.css" />
+<link rel="stylesheet" type="text/css"
+	href="../common/widget/jquery/themes/icon.css">
+<link rel="stylesheet" type="text/css" href="../common/css/demo.css">
+<script type="text/javascript"
+	src="../common/widget/jquery/jquery.min.js"></script>
+<script type="text/javascript"
+	src="../common/widget/jquery/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../common/widget/dragdrop/datagrid-dnd.js"></script>
+<script type="text/javascript" src="../common/js/public.js"></script>
+<script type="text/javascript" src="../common/js/validater.js"></script>
+<script type="text/javascript" src="js/operater.js"></script>
+</head>
+<body class="easyui-layout">
+	<div data-options="region:'center'">
+		<table id="operater_dg" class="easyui-datagrid"
+			data-options="rownumbers:true,fit:true,singleSelect:false,url:'../list.do',pagination:true,method:'get',fitColumns:true,onDblClickRow:dblClickOperaterRow,onClickRow:clickOperaterRow">
+			<thead>
+				<tr>
+				<!-- 	<th
+						data-options="field:'level',width:80,formatter:formatOperaterType,editor:{
+                            type:'combobox',options:{
+                                valueField:'type',
+                                textField:'typeName',
+                                data:[{type:'1',typeName:'管理账号'},{type:'0',typeName:'客户账号'}],
+                                required:true
+                            }
+                        }">用户类型</th>
+                         -->
+					<th data-options="field:'openId',width:60,editor:'text'">openid</th>
+					<th data-options="field:'spareField3',width:25,formatter:go">审核文件</th>
+					<th data-options="field:'nickname',width:60,editor:'text'">用户名</th>
+					<th data-options="field:'mobPhone',width:30,editor:'text'">手机号</th>
+					<th data-options="field:'company',width:20">公司</th>
+					<th data-options="field:'post',width:20">职位</th>
+				
+		
+					<!-- 
+					<th
+						data-options="field:'status',width:30,formatter:formatStatus,editor:{
+                            type:'combobox',options:{
+                                valueField:'status',
+                                textField:'statusName',
+                                data:[{status:'0',statusName:'禁用'},{status:'1',statusName:'启用',selected:true}],
+                                required:true
+                            }
+                        }">状态</th>
+                         -->
+				</tr>
+			</thead>
+		</table>
+	</div>
+	<!-- div data-options="region:'east',border:false"
+		style="width: 150px; padding: 10px;">
+		<table id="operater_role_dg" class="easyui-datagrid"
+			data-options="fitColumns:true">
+			<thead>
+				<tr>
+					<th data-options="field:'name',width:100">角色名</th>
+				</tr>
+			</thead>
+		</table>
+	</div-->
+	<div id="operater_window" class="easyui-window" style="padding: 10px;"
+		data-options="modal:true,closed:true,iconCls:'icon-save',maximizable:false,minimizable:false,collapsible:false">
+		<div class="easyui-panel" data-options="fit:true">
+			<form id="operater_window_form" method="post">
+				<table cellpadding="5">		
+			 		<tr>
+			 		<!-- 设置不可读 -->
+						<td align="right">openid:</td>
+						<td><input id="operater_window_code"
+							class="easyui-validatebox textbox" type="text"readonly="readonly"
+							style="width: 200px" name="openId"
+							data-options="required:false,editable:false"></input></td>
+					</tr>
+					<tr>
+						<td align="right">用户名:</td>
+						<td><input id="operater_window_name"
+							class="easyui-validatebox textbox"
+							style="width: 200px; box-sizing: content-box;" name="nickname"
+							data-options="required:false"></input></td>
+					</tr>
+					<tr id="operater_window_password_tr">
+						<td align="right">职务:</td>
+						<td><input id="operater_window_password"
+								class="easyui-validatebox textbox"
+								style="width: 200px" name="post"
+							data-options="required:false"></input></td>
+					</tr>
+					<tr id="operater_window_repeat_password_tr">
+						<td align="right">公司:</td>
+						<td><input id="operater_window_repeat_password"
+								class="easyui-validatebox textbox"
+								style="width: 200px" name="company"
+							data-options="required:false"></input></td>
+					</tr>
+						<!-- 	<tr id="operater_window_repeat_sf3">
+						<td align="right">审核:</td>
+							<td><input id="operater_window_repeat_sf3c"
+								class="easyui-validatebox textbox"
+								style="width: 200px" name="spareField1"
+							data-options="required:false"></input></td>
+					</tr>
+					 -->
+					<!-- 树形下拉框 -->
+						<tr id="operater_window_repeat_sf4">
+						<td align="right">审核:</td>
+						<td><select class="easyui-combotree" url="data.json" name="spareField1" style="width:156px;"/></td>
+					</tr>
+				</table>
+			</form>
+				<div style="text-align: center; padding: 5px">
+				<a id="operater_window_submit" href="javascript:void(0)"
+					class="easyui-linkbutton">提交</a>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>

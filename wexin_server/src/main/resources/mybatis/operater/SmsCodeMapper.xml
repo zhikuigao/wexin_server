@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jws.app.operater.data.SmsCodeMapper" >
+  <resultMap id="BaseResultMap" type="com.jws.app.operater.model.SmsCode" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="openid" property="openid" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="code" property="code" jdbcType="VARCHAR" />
+  </resultMap>
+ 
+  <insert id="insert" parameterType="com.jws.app.operater.model.SmsCode" >
+    insert into tb_code_sms (id, phone, openid, 
+      create_time, code)
+    values (#{id,jdbcType=INTEGER}, #{phone,jdbcType=VARCHAR}, #{openid,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{code,jdbcType=VARCHAR})
+  </insert>
+  
+  <select id="testSmsCode" parameterType="map" resultMap="BaseResultMap">
+		SELECT * FROM tb_code_sms WHERE openid = #{openid,jdbcType=VARCHAR} AND phone = #{phone,jdbcType=VARCHAR} ORDER BY create_time DESC LIMIT 0,1
+  </select>
+  
+</mapper>

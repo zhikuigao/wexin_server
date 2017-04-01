@@ -1,0 +1,353 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="renderer" content="webkit">
+<meta name="format-detection" content="telephone=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<script type="text/javascript" src="/weixin/js/adaptive.js"></script>
+
+<link rel="stylesheet" type="text/css" href="/weixin/css/style.css"/>
+<script type="text/javascript" src="/weixin/js/jquery.min.js"></script>
+<script type="text/javascript" src="/weixin/js/fastclick.js"></script>
+<script type="text/javascript" src="/weixin/js/common.js"></script>
+<script type="text/javascript" src="/weixin/plugins/layer/layer.js"></script>
+
+<title>创伙伴·帮忙</title>
+</head>
+<body>
+<div class="body-wrap other-info head-location">
+	<div class="person-info pd20 pb90">
+		<div class="info-box">
+			
+		</div>
+		<div class="mine-tab">
+			<div class="tab-item active" data-index="1"><span class="w">他的提问</span></div>
+			<div class="tab-item"  data-index="0"><span class="w">他的回答</span></div>
+		</div>
+	</div>
+	<div class="pd20 show-list">
+
+	</div>	
+</div>
+<footer>
+	<div class="fix-wrap">
+		<a href="index.html" class="item item1">
+			<div class="icon"></div>
+			首页
+		</a>
+		<div class="item item2 g-publish">
+			<div class="circle"></div>
+			<div class="con-wrap">
+				<div class="icon"></div>
+				发布
+			</div>
+		</div>
+		<a href="mine.html" class="item item3 active">
+			<div class="icon"></div>
+			我的
+		</a>
+	</div>
+	<div class="menu-box">
+		<div class="fix-shade"></div>
+		<div class="fix-close"></div>
+		<div class="pub-list">
+			<a href="weixinpay/publish.html?classId=问事" class="pub-item"><span class="pub-icon pub-icon1"></span>问事</a>
+			<a href="weixinpay/publish.html?classId=找人" class="pub-item"><span class="pub-icon pub-icon2"></span>找人</a>
+			<a href="weixinpay/publish.html?classId=任务" class="pub-item"><span class="pub-icon pub-icon3"></span>任务</a>
+		</div>
+	</div>
+</footer>
+
+<script type="text/javascript">
+$(function(){
+	getRegisterStatus();
+
+	var hisId = GetRequest().openid;
+	(function(){
+		var temp = 	'<div class="g-box-item"  data-open="{openid}">'+
+						'<div class="p-info no-icon clearfix">'+
+							'<div class="head-wrap {isV}"><img class="head-img" src="{photo}" alt=""></div>'+
+							'<div class="in-wrap">'+
+								'<div class="name">{nickname}'+'<span class="attestation no"></span>'+'</div>'+
+								'<div class="from">'+
+									'<span class="company fc-aa dib">{company}</span>'+
+									'<span class="v-line dib"></span>'+
+									'<span class="position fc-aa dib">{post}</span>'+
+								'</div>'+
+							'</div>'+
+						'</div>'+
+					'</div>';
+		/*页面初始化*/
+		var personInfo = getUserInfo(hisId);
+		if(!personInfo)return;
+		if(!personInfo.amountMoneyDisplay||personInfo.amountMoneyDisplay==''){
+			$(".account-balance .num").html("");
+		}else{
+			$(".account-balance .num").html(personInfo.amountMoneyDisplay+"元");
+		}
+		var newTemp = temp;
+
+		if(!personInfo.company){
+			var newTemp = temp.replace('<span class="company fc-aa dib">{company}</span>'+
+							'<span class="v-line dib"></span>','');
+			
+		}
+		if(!personInfo.post){
+			var newTemp = temp.replace('<span class="v-line dib"></span>'+
+							'<span class="position fc-aa dib">{post}</span>','');
+		}
+		if(!personInfo.company&&!personInfo.post){
+			var newTemp = temp.replace('<span class="company fc-aa dib">{company}</span>'+
+							'<span class="v-line dib"></span><span class="position fc-aa dib">{post}</span>','');
+		}
+
+		personInfo.isV = parseInt(personInfo.spareField1)==2?"v":"";
+
+		var info = newTemp.Format(personInfo);
+		$(".info-box").html(info);
+		switch(parseInt(personInfo.spareField1)){
+			case 1:
+				$(".attestation").addClass("no");
+				break;
+			case 2:
+				$(".attestation").removeClass("no");
+				break;
+			default:
+				$(".attestation").addClass("no");
+		}
+	})();
+
+	/*var param = GetRequest(),getId;
+	var otheropenid = param.openid;*/
+
+	function getMyQuestion(openid){
+		var url = root_+"/weixin/entry/interfaceEntry.do?paramObject";
+		
+		var openid = openid;
+		var data = {
+			busiCode:"queryProblemInfo",
+			openid:openid
+		}
+		new SelfAjax({
+			url:url,
+			data:data,
+			success:function(data){
+				if(data.resultDesc){
+					showList(data.resultDesc);
+				}else{
+					alert("程序异常");
+				}
+			},
+			error:function(errorMsg){
+				alert(msg);
+			}
+		});
+	}
+	getMyQuestion(openid);
+
+
+	var temp1 = 	'<a href="help-detail.html?questId={problemId}" class="g-box-item" data-open="{openid}" data-id="{problemId}">'+
+					'<div class="p-info clearfix">'+
+						'<div class="head-wrap"><img src={photo} alt=""></div>'+
+						'<div class="in-wrap">'+
+							'<div class="name">{nickname}</div>'+
+							'<div class="from">'+
+								'<span class="company fc-aa dib">{company}</span>'+
+								'<span class="v-line dib"></span>'+
+								'<span class="position fc-aa dib">{post}</span>'+
+							'</div>'+
+						'</div>'+
+						'<div class="reward">{amountMoney}元</div>'+
+					'</div>'+
+					'<div class="demand"><span class="tag dib">{secondClassification}</span>{contentProblem}</div>'+
+					'<div class="handle-status clearfix">'+
+						'<div class="fl">'+
+							'<span class="fc-aa dib">{problemHelpCount}个伙伴在帮忙</span>'+
+							'<span class="v-line dib"></span>'+
+							'<span class="fc-aa dib">{lastTime}</span>'+
+						'</div>'+
+						'{statusHtml}'+
+					'</div>'+
+				'</a>';
+	var temp2 = '<a href="help-detail.html?questId={problemId}" class="g-box-item no-pinfo"  data-open="{openid}" data-id="{problemId}">'+
+					'<div class="demand"><span class="tag dib">{secondClassification}</span>{contentProblem}</div>'+
+					'<div class="handle-status clearfix">'+
+						'<div class="fl">'+
+							'<span class="fc-aa dib">{problemHelpCount}个伙伴在帮忙</span>'+
+							'<span class="v-line dib"></span>'+
+							'<span class="fc-aa dib">{lastTime}</span>'+
+						'</div>'+
+						'{statusHtml}'+
+					'</div>'+
+				'</a>';
+
+	function showList(data){
+		var tab1Obj = data.problemKillData;
+		var tab2Obj = data.problemData;
+		var tab3Obj = data.problemShareData;
+
+		var totalObj = [];
+		totalObj.push(tab1Obj,tab2Obj,tab3Obj);
+
+		$(".mine-tab").on("click",".tab-item",function(){
+			$(".show-list").html('');
+			var layerIndex = globalBeforeSend();
+			var tabIndex = $(this).index();
+			$(this).addClass("active").siblings().removeClass("active");
+
+			changeHtml(tabIndex,layerIndex);
+			
+		});
+		/*function upSort(x, y) {
+            return (x.createTime > y.createTime) ? 1 : -1
+ 
+        }*/
+		function changeHtml(tabIndex,layerIndex){
+			var curObj = totalObj[tabIndex];
+			var url = root_+"/weixin/entry/interfaceEntry.do?paramObject";
+			console.log(curObj);
+
+			if(tabIndex==1){
+				var temp = temp2;
+			}else{
+				var temp = temp1;
+			}
+			if(curObj.length>0){	
+				var detailArr = [];
+				for(var i=0,len=curObj.length;i<len;i++){
+					var html='';
+					if(tabIndex==1){
+						var questId = curObj[i].id;
+					}else{
+						var questId = curObj[i].probelemid;
+					}
+					(function(questId){
+						var returnVal;
+						var data = {
+							busiCode:"queryProblemDesc",
+							id:questId
+						}
+						new SelfAjax({
+							url:url,
+							data:data,
+							async:false,
+							success:function(data){
+								if(data.result.code!=1){
+									alert(data.result.desc);
+								}else{
+									returnVal = data.resultDesc;
+									returnVal.questId = questId;
+									detailArr.push(returnVal);
+								}
+							},
+							error:function(){}
+						});
+					})(questId);
+					/*获取问题信息*/
+				}
+				detailArr = detailArr.sort(function(x,y){
+					var xKey = x.problemKillrecord;
+					var yKey = y.problemKillrecord;
+					return (xKey[xKey.length-1].createTime < yKey[yKey.length-1].createTime) ? 1 : -1
+				});
+				console.log(detailArr);
+				getMyList(detailArr,temp);
+				$(".no-data").hide();
+			}else{
+				$(".show-list").html(noDataHtml);
+			}
+			layer.close(layerIndex);
+		}
+		changeHtml(0);
+	}
+
+	function getMyList(dataArr,temp){
+		
+		for(var i=0,len=dataArr.length;i<len;i++){
+			var data = dataArr[i];
+
+			var problemHelpCount = data.problemHelpCount;
+			var questInfo = data.problemDesc;
+
+			var lastTime = dateFormat(questInfo.lastTime);
+			var thisOpenid = questInfo.openid;
+			var userInfo = getUserInfo(thisOpenid);
+
+			if(!questInfo.lastTime){
+				questInfo.lastTime = '';
+				temp = temp.replace('<span class="v-line dib"></span>'+
+							'<span class="fc-aa dib">{lastTime}</span>','');
+			}else{
+				if(lastTime.days>0){
+					var lt = {
+						d:lastTime.days<=0?"":lastTime.days+"天"
+					}
+					var limitTime = "剩余"+lt.d;
+				}else{
+					var lt = {
+						d:lastTime.days<=0?"":lastTime.days+"天",
+						h:lastTime.h<=0?"":lastTime.h+"小时",
+						m:lastTime.m<=0?"":lastTime.m+"分钟"
+					}
+					var limitTime = "剩余"+lt.d+lt.h+lt.m;
+				}
+				questInfo.lastTime = limitTime;
+			}
+			
+			
+			var statusHtml = getStatusHtml(questInfo.statusProblem);
+			var htmlObj ={
+				problemHelpCount:problemHelpCount,
+				problemId:data.questId,
+				statusHtml : statusHtml
+			}
+			
+			var resultObj = $.extend(true,{},htmlObj,questInfo,userInfo);
+			console.log(resultObj);
+			if(!resultObj.company){
+				temp = temp.replace('<span class="company fc-aa dib">{company}</span><span class="v-line dib"></span>','');
+			}
+			if(!resultObj.post){
+				temp = temp.replace('<span class="v-line dib"></span><span class="post fc-aa dib">{post}</span>','');
+			}
+			var finalObj = firstClassWordHandle(resultObj);
+			html = temp.Format(finalObj);
+			
+			$(".show-list").append(html);
+
+		}
+				
+	}
+	function getQuestDetail(questId){
+		
+		return returnVal
+	}
+
+	function getStatusHtml(status){
+		switch(status){
+			case 1:
+			  return '';
+			  break;
+			case 2:
+			  return '';
+			  break;
+			case 3:
+			  return '<div class="status-btn fr">处理中</div>';
+			  break;
+			case 4:
+			  return '<div class="status-btn status-over fr">已搞定</div>';
+			  break;
+			case 5:
+			  return '<div class="status-btn status-over fr">超时</div>';
+			  break;
+			default:
+			  return '';
+		}
+	}
+});
+</script>
+</body>
+</html>

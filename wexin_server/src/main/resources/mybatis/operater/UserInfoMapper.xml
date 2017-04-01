@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jws.app.operater.data.UserInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.jws.app.operater.model.UserInfo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="open_id" property="openid" jdbcType="VARCHAR" />
+    <result column="nickname" property="nickname" jdbcType="VARCHAR" />
+    <result column="mob_phone" property="mobPhone" jdbcType="VARCHAR" />
+    <result column="company" property="company" jdbcType="VARCHAR" />
+    <result column="post" property="post" jdbcType="VARCHAR" />
+    <result column="introductionSelf" property="introductionself" jdbcType="VARCHAR" />
+    <result column="photo" property="photo" jdbcType="VARCHAR" />
+    <result column="sex" property="sex" jdbcType="INTEGER" />
+    <result column="country" property="country" jdbcType="VARCHAR" />
+    <result column="spare_field1" property="spareField1" jdbcType="VARCHAR" />
+    <result column="spare_field2" property="spareField2" jdbcType="VARCHAR" />
+    <result column="spare_field3" property="spareField3" jdbcType="VARCHAR" />
+    <result column="spare_field4" property="spareField4" jdbcType="VARCHAR" />
+    <result column="spare_field5" property="spareField5" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  
+    <resultMap id="BaseResultMap2" type="com.jws.app.operater.model.Feedback" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="openid" property="openid" jdbcType="VARCHAR" />
+    <result column="problemId" property="problemid" jdbcType="INTEGER" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <insert id="insert" parameterType="com.jws.app.operater.model.UserInfo" >
+    insert into tb_user_info (id, open_id, nickname, 
+      mob_phone, company, post, 
+      introductionSelf, photo, sex, 
+      country, spare_field1, spare_field2, 
+      spare_field3, spare_field4, spare_field5, 
+      create_time)
+    values (#{id,jdbcType=INTEGER}, #{openid,jdbcType=VARCHAR}, #{nickname,jdbcType=VARCHAR}, 
+      #{mobPhone,jdbcType=VARCHAR}, #{company,jdbcType=VARCHAR}, #{post,jdbcType=VARCHAR}, 
+      #{introductionself,jdbcType=VARCHAR}, #{photo,jdbcType=VARCHAR}, #{sex,jdbcType=INTEGER}, 
+      #{country,jdbcType=VARCHAR}, #{spareField1,jdbcType=VARCHAR}, #{spareField2,jdbcType=VARCHAR}, 
+      #{spareField3,jdbcType=VARCHAR}, #{spareField4,jdbcType=VARCHAR}, #{spareField5,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+
+  <update id="updateByPrimaryKey" parameterType="com.jws.app.operater.model.UserInfo" >
+    	update tb_user_info set 
+         <if test="nickname != null" >
+         nickname = #{nickname,jdbcType=VARCHAR},
+          </if>
+        <if test="mobPhone != null" >
+          mob_phone = #{mobPhone,jdbcType=VARCHAR},
+        </if>
+        <if test="company != null" >
+          company = #{company,jdbcType=VARCHAR},
+        </if>
+        <if test="post != null" >
+       	 post = #{post,jdbcType=VARCHAR},
+        </if>
+        <if test="introductionself != null" >
+         introductionSelf = #{introductionself,jdbcType=VARCHAR},
+        </if>
+        <if test="photo != null" >
+         photo = #{photo,jdbcType=VARCHAR},
+        </if>
+        <if test="sex != null" >
+       	 sex = #{sex,jdbcType=INTEGER},
+        </if>
+        <if test="country != null" >
+        	country = #{country,jdbcType=VARCHAR},
+        </if>
+        <if test="spareField1 != null" >
+        spare_field1 = #{spareField1,jdbcType=VARCHAR},
+        </if>
+        <if test="spareField2 != null" >
+        spare_field2 = #{spareField2,jdbcType=VARCHAR},
+        </if>
+         <if test="spareField3 != null" >
+           spare_field3 = #{spareField3,jdbcType=VARCHAR},
+        </if>
+         <if test="spareField4 != null" >
+          spare_field4 = #{spareField4,jdbcType=VARCHAR},
+        </if>
+         spare_field5 = #{spareField5,jdbcType=VARCHAR}
+			where open_id = #{openid,jdbcType=VARCHAR}
+  </update>
+  
+    <select id="queryPersonInfo" resultMap="BaseResultMap" parameterType="map">			
+			SELECT * FROM tb_user_info WHERE open_id = #{openid,jdbcType=VARCHAR}
+  </select>
+  
+      <select id="queryUserPhone" resultType="String" parameterType="map">			
+			SELECT mob_phone FROM tb_user_info WHERE open_id = #{openid,jdbcType=VARCHAR}
+  </select>
+  
+      <select id="queryUserInfo" resultMap="BaseResultMap" parameterType="map">			
+			SELECT * FROM tb_user_info WHERE spare_field1 = '1' AND spare_field3 IS NOT NULL  ORDER BY create_time DESC LIMIT #{page,jdbcType=INTEGER},#{pageNum,jdbcType=INTEGER}
+  </select>
+  
+   <select id="queryUserInfoCount" resultType="int" parameterType="map">			
+			SELECT COUNT(*) FROM tb_user_info WHERE spare_field1 = '1' AND spare_field3 IS NOT NULL  
+  </select>
+  
+     <select id="queryUserInfoList" resultMap="BaseResultMap" parameterType="map">			
+			SELECT * FROM tb_user_info ORDER BY create_time DESC LIMIT #{page,jdbcType=INTEGER},#{pageNum,jdbcType=INTEGER}
+  </select>
+  
+    <select id="queryUserInfoListCount" resultType="int" parameterType="map">			
+			SELECT COUNT(*) FROM tb_user_info ORDER BY create_time DESC 
+  </select>
+  
+        <select id="queryUserIstruePhone" resultMap="BaseResultMap" parameterType="map">			
+			SELECT * FROM tb_user_info WHERE mob_phone = #{phone,jdbcType=VARCHAR}
+  </select>
+  
+    <insert id="insertFeek" parameterType="com.jws.app.operater.model.Feedback" >
+    insert into tb_feedback (id, openid, problemId, 
+      content)
+    values (#{id,jdbcType=INTEGER}, #{openid,jdbcType=VARCHAR}, #{problemid,jdbcType=INTEGER}, 
+      #{content,jdbcType=VARCHAR})
+  </insert>
+  
+
+</mapper>

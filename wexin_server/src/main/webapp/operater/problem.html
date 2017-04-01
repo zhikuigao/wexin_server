@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE8"
+	content="ie=edge" />
+<meta charset="UTF-8">
+<link rel="stylesheet" type="text/css"
+	href="../common/widget/jquery/themes/default/easyui.css" />
+<link rel="stylesheet" type="text/css"
+	href="../common/widget/jquery/themes/icon.css">
+<link rel="stylesheet" type="text/css" href="../common/css/demo.css">
+<script type="text/javascript"
+	src="../common/widget/jquery/jquery.min.js"></script>
+<script type="text/javascript"
+	src="../common/widget/jquery/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../common/widget/dragdrop/datagrid-dnd.js"></script>
+<script type="text/javascript" src="../common/js/public.js"></script>
+<script type="text/javascript" src="../common/js/validater.js"></script>
+<script type="text/javascript" src="js/problem.js"></script>
+</head>
+<body class="easyui-layout">
+	<div data-options="region:'center'">
+		<table id="problem_dg" class="easyui-datagrid"
+			data-options="rownumbers:true,fit:true,singleSelect:false,url:'../problem.do',pagination:true,method:'get',fitColumns:true,onDblClickRow:dblClickproblemRow,onClickRow:clickproblemRow">
+			<thead>
+				<tr>
+				<!-- 	<th
+						data-options="field:'level',width:80,formatter:formatproblemType,editor:{
+                            type:'combobox',options:{
+                                valueField:'type',
+                                textField:'typeName',
+                                data:[{type:'1',typeName:'管理账号'},{type:'0',typeName:'客户账号'}],
+                                required:true
+                            }
+                        }">用户类型</th>
+                         -->
+					<th data-options="field:'id',width:10,editor:'text'">id</th>
+					<th data-options="field:'firstClassification',width:15,editor:'text'">一级分类</th>
+					<th data-options="field:'secondClassification',width:15,editor:'text'">二级户名</th>
+					<th data-options="field:'contentProblem',width:100,editor:'text'">问题内容</th>
+					<th data-options="field:'amountMoney',width:10,editor:'text'">金额</th>
+					<th data-options="field:'openid',width:50,editor:'text'">创建人</th>
+				
+		
+					<!-- 
+					<th
+						data-options="field:'status',width:30,formatter:formatStatus,editor:{
+                            type:'combobox',options:{
+                                valueField:'status',
+                                textField:'statusName',
+                                data:[{status:'0',statusName:'禁用'},{status:'1',statusName:'启用',selected:true}],
+                                required:true
+                            }
+                        }">状态</th>
+                         -->
+				</tr>
+			</thead>
+		</table>
+	</div>
+	<!-- div data-options="region:'east',border:false"
+		style="width: 150px; padding: 10px;">
+		<table id="problem_role_dg" class="easyui-datagrid"
+			data-options="fitColumns:true">
+			<thead>
+				<tr>
+					<th data-options="field:'name',width:100">角色名</th>
+				</tr>
+			</thead>
+		</table>
+	</div-->
+	<div id="problem_window" class="easyui-window" style="padding: 10px;"
+		data-options="modal:true,closed:true,iconCls:'icon-save',maximizable:false,minimizable:false,collapsible:false">
+		<div class="easyui-panel" data-options="fit:true">
+			<form id="problem_window_form" method="post">
+				<table cellpadding="5">		
+			 		<tr>
+			 		<!-- 设置不可读 -->
+						<td align="right">id:</td>
+						<td><input id="problem_window_code"
+							class="easyui-validatebox textbox" type="text"readonly="readonly"
+							style="width: 200px" name="id"
+							data-options="required:false,editable:false"></input></td>
+					</tr>
+					
+					<tr>
+						<td align="right">问题内容:</td>
+						<td><input id="problem_window_name"
+							class="easyui-validatebox textbox"
+							style="width: 200px; box-sizing: content-box;" name="contentProblem"
+							data-options="required:false"></input></td>
+					</tr>
+					<tr id="problem_window_password_tr">
+						<td align="right">金额:</td>
+						<td><input id="problem_window_password"
+								class="easyui-validatebox textbox"
+								style="width: 200px" name="amountMoney"
+							data-options="required:false"></input></td>
+					</tr>
+				<tr id="problem_window_repeat_password_tr">
+						<td align="right">创建人:</td>
+						<td><input id="problem_window_repeat_password"
+								class="easyui-validatebox textbox"type="text"readonly="readonly"
+								style="width: 200px" name="openid"
+							data-options="required:false"></input></td>
+					</tr>
+			<!--		 	<tr id="problem_window_repeat_sf3">
+						<td align="right">审核:</td>
+							<td><input id="problem_window_repeat_sf3c"
+								class="easyui-validatebox textbox"
+								style="width: 200px" name="spareField1"
+							data-options="required:false"></input></td>
+					</tr>
+					 
+					 树形下拉框
+						<tr id="problem_window_repeat_sf4">
+						<td align="right">审核:</td>
+						<td><select class="easyui-combotree" url="data.json" name="spareField1" style="width:156px;"/></td>
+					</tr> -->
+				</table>
+			</form>
+				<div style="text-align: center; padding: 5px">
+				<a id="problem_window_submit" href="javascript:void(0)"
+					class="easyui-linkbutton">提交</a>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>

@@ -1,0 +1,172 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="renderer" content="webkit">
+<meta name="format-detection" content="telephone=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<script type="text/javascript" src="/weixin/js/adaptive.js"></script>
+
+<link rel="stylesheet" type="text/css" href="/weixin/css/style.css"/>
+<script type="text/javascript" src="/weixin/js/jquery.min.js"></script>
+<script type="text/javascript" src="/weixin/js/fastclick.js"></script>
+<script type="text/javascript" src="/weixin/js/common.js"></script>
+<script type="text/javascript" src="/weixin/plugins/layer/layer.js"></script>
+
+<title>创伙伴·帮忙</title>
+</head>
+<body>
+<div class="body-wrap info-form">
+	<div class="head-info mt18 clearfix">
+		头像
+		<div class="head-wrap fr">
+			<img class="head-img" src="images/head.png" alt="">
+		</div>
+	</div>
+	<div class="form-group  mt18">
+		<a href="attestation.html" class="form-item">
+			认证
+			<span class="attestation no"></span>
+		</a>
+	</div>
+	<div class="form-group  mt18">
+		<div class="form-item">
+			<label class="label">名称</label>
+			<input id="nickname" type="text" placeholder="请输入你的名称" class="g-input">
+		</div>
+	</div>
+	<div class="form-group  mt18">
+		<div class="form-item">
+			<label class="label">公司</label>
+			<input id="company" type="text" placeholder="请输入你的公司全称" class="g-input">
+		</div>
+		<div class="form-item">
+			<label class="label">职务</label>
+			<input id="position" type="text" placeholder="请输入你的职务" class="g-input">
+		</div>
+	</div>
+	<div class="form-group  mt18">
+		<div class="form-item">
+			<label class="label">手机号</label>
+			<input id="phone" type="text" placeholder="" class="g-input" disabled>
+		</div>
+		<div class="form-item">
+			<label class="label">微信号</label>
+			<input id="wechat" type="text" placeholder="" class="g-input">
+		</div>
+	</div>
+	<div class="form-group  mt18">
+		<textarea id="introductionSelf" class="textarea" placeholder="自我介绍"></textarea>
+	</div>
+	<div class="pd20">
+		<div class="submit g-btn fix-btn-item btn-highlight g-submit">保存</div>
+		<a href="mine.html" class="submit g-btn cancel g-submit">取消</a>
+	</div>
+</div>
+
+<script type="text/javascript">
+$(function(){
+	var $nickname = $("#nickname"),
+		$username = $("#username"),
+		$company  = $("#company"),
+		$position = $("#position"),
+		$phone    = $("#phone"),
+		$wechat   = $("#wechat"),
+		$introductionSelf   = $("#introductionSelf");
+
+	var info = {
+		formData:{
+			nickname : "",
+			username : "",
+			company  : "",
+			post     : "",
+			mobPhone    : "",
+			spareField4   : "",
+			introductionself:"",
+		},
+		getUserInfo:function(){
+			var personInfo = getUserInfo(openid);
+		},
+		expForm:function(){
+			var data = info.formData;
+			console.log(data);
+			$(".head-img").attr("src",data.photo);
+			if(!data.spareField1||data.spareField1==""){
+				data.spareField1 = 1;
+			}
+			if(!data.spareField3||data.spareField3==""){
+				data.spareField3 = '';
+			}
+			$(".attestation").parents("a").attr("href",$(".attestation").parents("a").attr("href"));
+			switch(parseInt(data.spareField1)){
+				case 1:
+					$(".attestation").addClass("no");
+					break;
+				case 2:
+					$(".attestation").removeClass("no");
+					break;
+				default:
+					$(".attestation").addClass("no");
+
+			}
+			$nickname.val(data.nickname);
+			$username.val(data.username);
+			$company.val(data.company);
+			$position.val(data.post);
+			$phone.val(data.mobPhone);
+			$wechat.val(data.spareField4);
+			$introductionSelf.val(data.introductionself);
+
+		},
+		formSubmit:function(){
+			var nickname = $nickname.val(),
+				username = $username.val(),
+				company  = $company.val(),
+				position = $position.val(),
+				phone    = $phone.val(),
+				wechat   = $wechat.val(),
+				introductionSelf   = $introductionSelf.val();
+
+			var data={
+				busiCode:"updatePersonInfo",
+				openid:openid,
+				nickname:nickname,
+				mobphone:phone,
+				company:company,
+				post:position,
+				wechat:wechat,
+				introductionSelf:introductionSelf
+			}
+			var url = root_+"/weixin/entry/interfaceEntry.do";
+			new SelfAjax({
+				url:url,
+				data:data,
+				success:function(data){
+					window.location.href = "mine.html";
+				},
+				error:function(errorMsg){
+					alert(errorMsg);
+				}
+			});
+		},
+		refreshData:function(){
+			var personInfo = getUserInfo(openid);
+			console.log(personInfo);
+			this.formData = $.extend(this.formData,personInfo)
+			this.expForm();
+		},
+		init:function(){
+			this.refreshData();
+
+			$(".submit").on("click",function(){
+				info.formSubmit();
+			});
+		}
+	}
+	info.init();
+});
+</script>
+</body>
+</html>

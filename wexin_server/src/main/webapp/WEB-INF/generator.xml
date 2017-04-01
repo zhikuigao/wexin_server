@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+  <!DOCTYPE generatorConfiguration
+  PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+  "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+     
+    <generatorConfiguration>
+    <classPathEntry
+		location="D:\soft\apache-maven-3.3.3\lib\mysql-connector-java-5.1.13.jar" />
+    
+    <context id="mysqlTables" targetRuntime="MyBatis3">
+    
+      <commentGenerator>
+     
+        <property name="suppressAllComments" value="true"/>        
+      </commentGenerator>
+      <jdbcConnection driverClass="com.mysql.jdbc.Driver" connectionURL="jdbc:mysql://127.0.0.1:3306/test"
+			userId="root" password="1q2w!Q@W">
+		</jdbcConnection>
+      <javaTypeResolver>
+         <property name="forceBigDecimals"  value="false"/>
+      </javaTypeResolver>
+     <javaModelGenerator targetPackage="sqlmap" targetProject="spring-mybatis-mvc1\src\main\java">
+          <property name="enableSubPackages" value="true"/>
+          <property name="trimStrings" value="true"/>
+      </javaModelGenerator> 
+      <sqlMapGenerator targetPackage="sqlmap" targetProject="spring-mybatis-mvc1\src\main\java">
+           <property name="enableSubPackages" value="false"/>
+      </sqlMapGenerator>
+    <javaClientGenerator type="XMLMAPPER"  targetPackage="sqlmap" targetProject="spring-mybatis-mvc1\src\main\java">
+        <property name="enableSubPackages" value="true"/>
+      </javaClientGenerator>
+      <table schema="untodo" tableName="tb_crowdfunding" domainObjectName="Crowdfunding">
+      </table>
+    </context>
+      
+    </generatorConfiguration>

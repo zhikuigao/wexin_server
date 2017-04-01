@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jws.app.operater.data.IndusReportMapper" >
+  <resultMap id="IndusReportResultMap" type="com.jws.app.operater.model.IndusReport" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="source_id" property="sourceId" jdbcType="INTEGER" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="url" property="url" jdbcType="VARCHAR" />
+    <result column="abstract_txt" property="abstractTxt" jdbcType="VARCHAR" />
+    <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <resultMap  id="IndusReportExtendResultMap"  extends="IndusReportResultMap" type="com.jws.app.operater.model.IndusReport">
+  	<result column="sourceName" property="sourceName" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <sql id="IndusReport_Column_List" >
+  	 r.id, r.source_id, r.title, r.url, r.abstract_txt, r.created_time, r.update_time, r.remark
+  </sql>
+  <!-- 查询 -->
+	<select id="getByKey" resultMap="IndusReportResultMap" parameterType="java.io.Serializable">
+		<if test="key != null">
+			select
+			<include refid="IndusReport_Column_List" />
+			from tb_report  r where  r.id = #{key}
+		</if>
+	</select>
+  <select id="selectCurrTime" resultType="date">
+  	select now()
+  </select>
+  <select id="selectByPrimaryKey" resultMap="IndusReportResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="IndusReport_Column_List" />
+    from tb_report r
+    where  r.id = #{id,jdbcType=INTEGER}
+  </select>
+  <!-- 根据标签获取匹配的相关报告 -->
+  <select id="selectByKeys" resultMap="IndusReportExtendResultMap" parameterType="map">
+   select 
+    	 <include refid="IndusReport_Column_List" /> 
+     	,c.name  sourceName
+    from tb_report  r  join tb_channel c ON r.source_id = c.ID
+    where r.source_id = #{sourceid} and ( r.title like #{keys} or r.abstract_txt like #{keys}) limit #{pageFrom},#{pageNum} 
+  </select>
+  <!-- 根据报告ID获取除此以外的报告，供推荐分析 -->
+  <select id="selectOtherByKey" resultMap="IndusReportExtendResultMap" parameterType="map">
+   select 
+    <include refid="IndusReport_Column_List" />
+      ,c.name  sourceName
+    from tb_report r join tb_channel c ON r.source_id = c.ID
+    where r.id != #{reportID} order by update_time desc 
+  </select>
+  <!-- 根据标签获取匹配的相关报告，翻页操作 ‘&lt;’为‘＜’的转义符-->
+  <select id="selectMoreByKeys" resultMap="IndusReportExtendResultMap" parameterType="map">
+   select 
+    <include refid="IndusReport_Column_List" />
+     ,c.name  sourceName
+    from tb_report r join tb_channel c ON r.source_id = c.ID
+    where r.source_id = #{sourceid} and ( r.title like #{keys} or r.abstract_txt like #{keys}) and r.created_time &lt;= #{lastTime} limit #{pageFrom},#{pageNum} 
+  </select>
+  <!-- 更新前获取更新的数量，‘&gt;’为‘>’的转义符 -->
+  <select id="selectNewCountByKeys" resultType="int" parameterType="map">
+   select 
+    count(1)
+    from tb_report
+    where source_id = #{sourceID}
+     and ( title like #{keys} or abstract_txt like #{keys}) and created_time &gt;= #{lastTime} 
+  </select>
+   <!-- 根据关键字在可选的数据源中搜索匹配的报告 -->
+  <select id="selectAllByKeys" resultMap="IndusReportExtendResultMap" parameterType="map">
+   select 
+    <include refid="IndusReport_Column_List" />
+      ,c.name  sourceName
+    from tb_report r join tb_channel c ON r.source_id = c.ID
+    where r.source_id in ( <foreach collection="sourceStrings" item="channelid" separator=","> #{channelid} </foreach> )
+       and ( r.title like #{keys} or r.abstract_txt like #{keys}) 
+       <if test="lastTime != null">
+       	 and r.created_time &lt;= #{lastTime} 
+       </if>      
+       limit #{pageFrom},#{pageNum}  
+  </select>
+  <select id="selectCountByKeys" resultType="int" parameterType="map">
+   select 
+    count(1)
+    from tb_report
+    where source_id in ( <foreach collection="sourceStrings" item="channelid" separator=","> #{channelid} </foreach> ) 
+    	and ( title like #{keys} or abstract_txt like #{keys})   
+    	   <if test="lastTime != null">
+       	 and created_time &lt;= #{lastTime} 
+       </if>
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from tb_report
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.jws.app.operater.model.IndusReport" >
+    insert into tb_report (id, source_id, title, 
+      url, abstract_txt, created_time, 
+      update_time, remark)
+    values (#{id,jdbcType=VARCHAR}, #{sourceId,jdbcType=INTEGER}, #{title,jdbcType=VARCHAR}, 
+      #{url,jdbcType=VARCHAR}, #{abstractTxt,jdbcType=VARCHAR}, #{createdTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.jws.app.operater.model.IndusReport" >
+    <!--
+      WARNING - @mbggenerated
+      This element is automatically generated by MyBatis Generator, do not modify.
+      This element was generated on Mon Jul 27 09:48:40 CST 2015.
+    -->
+    insert into tb_report
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="sourceId != null" >
+        source_id,
+      </if>
+      <if test="title != null" >
+        title,
+      </if>
+      <if test="url != null" >
+        url,
+      </if>
+      <if test="abstractTxt != null" >
+        abstract_txt,
+      </if>
+      <if test="createdTime != null" >
+        created_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="sourceId != null" >
+        #{sourceId,jdbcType=INTEGER},
+      </if>
+      <if test="title != null" >
+        #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null" >
+        #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="abstractTxt != null" >
+        #{abstractTxt,jdbcType=VARCHAR},
+      </if>
+      <if test="createdTime != null" >
+        #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.jws.app.operater.model.IndusReport" >
+    <!--
+      WARNING - @mbggenerated
+      This element is automatically generated by MyBatis Generator, do not modify.
+      This element was generated on Mon Jul 27 09:48:40 CST 2015.
+    -->
+    update tb_report
+    <set >
+      <if test="sourceId != null" >
+        source_id = #{sourceId,jdbcType=INTEGER},
+      </if>
+      <if test="title != null" >
+        title = #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null" >
+        url = #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="abstractTxt != null" >
+        abstract_txt = #{abstractTxt,jdbcType=VARCHAR},
+      </if>
+      <if test="createdTime != null" >
+        created_time = #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.jws.app.operater.model.IndusReport" >
+    <!--
+      WARNING - @mbggenerated
+      This element is automatically generated by MyBatis Generator, do not modify.
+      This element was generated on Mon Jul 27 09:48:40 CST 2015.
+    -->
+    update tb_report
+    set source_id = #{sourceId,jdbcType=INTEGER},
+      title = #{title,jdbcType=VARCHAR},
+      url = #{url,jdbcType=VARCHAR},
+      abstract_txt = #{abstractTxt,jdbcType=VARCHAR},
+      created_time = #{createdTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      remark = #{remark,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

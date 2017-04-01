@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/aop
+		http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/beans 
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/tx
+		http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+		http://www.springframework.org/schema/task 
+		http://www.springframework.org/schema/task/spring-task-3.0.xsd">
+		
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location">
+			<value>classpath:datasource.properties</value>
+		</property>
+	</bean>
+	<context:component-scan base-package="com.jws.app.*.control;com.jws.app.*.service.impl;yuntongxun.sms.*.control;yuntongxun.sms.*.service.impl;org.gzk.weixin.*.control;org.gzk.weixin.*.service.impl;org.gzk.pay.*.control;org.rwl.pay.weixin.servlet"/>
+	<!-- dataSource -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName">
+			<value>${ds.driverClassName}</value>
+		</property>
+		<property name="url">
+			<value>${ds.url}</value>
+		</property>
+		<property name="username">
+			<value>${ds.userName}</value>
+		</property>
+		<property name="password">
+			<value>${ds.password}</value>
+		</property>
+		<property name="maxActive">
+			<value>${ds.maxActive}</value>
+		</property>
+		<property name="maxWait">
+			<value>${ds.maxWait}</value>
+		</property>
+		<property name="defaultAutoCommit">
+			<value>${ds.defaultAutoCommit}</value>
+		</property>
+	</bean>
+
+	<!-- mybatis Template -->
+	<bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg index="0" ref="sqlSessionFactory" />
+		<constructor-arg index="1" value="BATCH" />
+	</bean>
+
+	<!-- <bean id="lobHandler" class="org.springframework.jdbc.support.lob.DefaultLobHandler"></bean> -->
+
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="mapperLocations" value="classpath*:mybatis/*/*.xml" />
+		<property name="plugins">
+			<bean id="paginationPlugin" class="com.jws.common.util.db.PaginationIntercepter" />
+		</property>
+	</bean>
+	
+
+	
+
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<!-- 如果这里用ref会报错，因为 propertyConfigurer的加载顺序在MapperScannerConfigurer之后,而dataSource需要用到propertyConfigurer的参数 -->
+		<!-- <property name="sqlSessionFactory" ref="sqlSessionFactory" /> -->
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+		<property name="basePackage" value="com.jws.app.*.data" />
+	</bean>
+
+	<!-- transaction Manage -->
+	<!-- <bean id="baseTxProxy" abstract="true" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean"> -->
+	<!-- <property name="transactionManager"> -->
+	<!-- <ref bean="transactionManager" /> -->
+	<!-- </property> -->
+	<!-- <property name="transactionAttributes"> -->
+	<!-- <props> -->
+	<!-- <prop key="*">PROPAGATION_REQUIRED,readOnly</prop> -->
+	<!-- <prop key="change*">PROPAGATION_REQUIRED,-ServiceException,-Exception</prop> -->
+	<!-- <prop key="save*">PROPAGATION_REQUIRED,-ServiceException,-Exception</prop> -->
+	<!-- <prop key="add*">PROPAGATION_REQUIRED,-ServiceException,-Exception</prop> -->
+	<!-- <prop key="del*">PROPAGATION_REQUIRED,-ServiceException,-Exception</prop> -->
+	<!-- <prop key="update*">PROPAGATION_REQUIRED,-ServiceException,-Exception</prop> -->
+	<!-- <prop key="set*">PROPAGATION_REQUIRED,-ServiceException,-Exception</prop> -->
+	<!-- <prop key="reset*">PROPAGATION_REQUIRED,-ServiceException,-Exception</prop> -->
+	<!-- <prop key="validate">PROPAGATION_REQUIRED,-ServiceException,-Exception</prop> -->
+	<!-- <prop key="upload*">PROPAGATION_REQUIRED,-ServiceException,-Exception</prop> -->
+	<!-- </props> -->
+	<!-- </property> -->
+	<!-- </bean> -->
+
+	<tx:advice id="txAdvice" transaction-manager="txManager">
+		<tx:attributes>
+			<!-- <tx:method name="*" propagation="REQUIRED" rollback-for="Exception" /> -->
+			<!-- 如果代码写的乱、差,就解开上面的注释 ，把下面的4行注释了 -->
+			<!--<tx:method name="*" propagation="REQUIRED" read-only="true" rollback-for="Exception" /-->
+			<tx:method name="*" propagation="REQUIRED" rollback-for="Exception" />
+			<tx:method name="select*" propagation="REQUIRED" rollback-for="Exception" />
+			<tx:method name="add*" propagation="REQUIRED" rollback-for="Exception" />
+			<tx:method name="insert*" propagation="REQUIRED"  rollback-for="Exception" />
+			<tx:method name="delete*" propagation="REQUIRED" rollback-for="Exception" />
+			<tx:method name="save*" propagation="REQUIRED" rollback-for="Exception" />
+			<tx:method name="update*" propagation="REQUIRED" rollback-for="Exception" />
+		</tx:attributes>
+	</tx:advice>
+
+	<aop:config proxy-target-class="true">
+		<!-- String result = StringUtils.replace(pcExpr, " and ", " && "); -->
+		<!-- result = StringUtils.replace(result, " or ", " || "); -->
+		<!-- result = StringUtils.replace(result, " not ", " ! "); -->
+		<!-- return result; -->
+		<!-- expression=execution(interface's method) -->
+		<!-- 对所有spring管理的bean都会检测一遍。如果expression中指定的是接口，判断是否是其子类，如果是，则子类中的所有方法都会检测一遍,并放入map中. -->
+		<!-- 如果具体类的具体方法是在expression对应接口中定义的方法，则，会标记需要事务拦截,map中key/value: -->
+		<!-- public com.jws.common.data.IMapper com.jws.app.operater.service.impl.RoleServiceImpl.getMapper()= org.aspectj.weaver.reflect.ShadowMatchImpl@709a22ea -->
+		<aop:pointcut id="txPointCuts"
+			expression="(execution(* com.jws.app.*.service.*.*(..)))||  (execution(* org.rwl.pay.*.servlet.*.*(..))) ||(execution(* yuntongxun.sms.sdk.*.service.*.*(..)))  ||(execution(* org.gzk.pay.weixin.*.control.*.*(..))) ||(execution(* org.gzk.weixin.*.service.*.*(..)))||(execution(* com.jws.common.service.IService.*(..)))" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="txPointCuts" />
+	</aop:config>
+
+	<bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+</beans>

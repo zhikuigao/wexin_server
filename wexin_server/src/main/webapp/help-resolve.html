@@ -1,0 +1,121 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="renderer" content="webkit">
+
+<meta name="format-detection" content="telephone=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<script type="text/javascript" src="/weixin/js/adaptive.js"></script>
+
+<link rel="stylesheet" type="text/css" href="/weixin/css/style.css"/>
+<script type="text/javascript" src="/weixin/js/jquery.min.js"></script>
+<script type="text/javascript" src="/weixin/js/fastclick.js"></script>
+<script type="text/javascript" src="/weixin/js/common.js"></script>
+<script type="text/javascript" src="/weixin/plugins/layer/layer.js"></script>
+
+<title>创伙伴·帮忙</title>
+</head>
+<body>
+<div class="body-wrap pd20 help-resolve">
+	<div class="g-textarea-wrap no-mt">
+		<textarea class="textarea inputLimit"  data-maxLen="140" placeholder="输入你的回答，回答越专业越详细，拿到赏金的机率越高！"></textarea>
+		<span class="tips">140字</span>
+	</div>
+
+	<div class="attention">注：提交回答后不可修改，同一个回答最多提交3次，回答后对方可查看你的联系方式。 </div>
+	<input type="submit" value="提交" class="g-submit btn-highlight w100">
+</div>
+
+<script type="text/javascript">
+var app = {
+	questId:GetRequest().questId,
+	openidBy:"",
+	openid:openid,
+	changeStatus:function(problemStatus){
+		var url = root_+"/weixin/entry/interfaceEntry.do?paramObject";
+		var data = {
+			busiCode:"updateProStatus",
+			id:app.questId,
+			problemStatus:problemStatus
+		}
+		new SelfAjax({
+			url:url,
+			data:data,
+			success:function(data){
+				if(data.result.code==1){
+					setTimeout(function(){
+						window.location.href="help-detail.html?questId="+app.questId
+					},2000);
+				}
+			},
+			error:function(){
+
+			}
+		});
+	},
+	eventBind:function(){
+		/*事件绑定*/
+		$(".g-submit").on("click",function(){
+			var content= $(".textarea").val();
+			if(!content){
+				alert("您还未输入内容");
+				return false;
+			}
+			var url = root_+"/weixin/entry/interfaceEntry.do?paramObject";
+			var data = {
+				busiCode:"solvProblemRecord",
+				probelemId:app.questId,
+				weixinId:app.openid,
+				content:content
+			}
+			new SelfAjax({
+				url:url,
+				data:data,
+				success:function(data){
+					console.log(data);
+					showInfoDialog(1,"帮忙回答提交成功<br>请等待发布者确认","跳转到信息页面");
+					if(data.result.code==1){
+						app.changeStatus(3);
+					}
+
+					if(app.openidBy!=""){
+						addHelpRecord(app.questId,app.openidBy);
+					}else{
+						addHelpRecord(app.questId);
+					}
+					
+				},
+				error:function(){
+					alert("网络错误");
+				}
+			});
+		});
+
+		var maxWord = $(".inputLimit").attr("data-maxLen");
+		$(".inputLimit").on("input onpropertychange",function(){
+			var thisVal = $(this).val(),
+				thisLen = thisVal.length;
+			var num = maxWord-thisLen;
+			$(this).siblings(".tips").html(num+"字");
+			if(num<=0){
+				$(this).val(thisVal.substr(0,maxWord-1));
+				return false;
+			}
+		});
+	},
+	init:function(){
+		if(GetRequest().openidBy){
+			app.openidBy = GetRequest().openidBy;
+		}
+		app.eventBind();
+	}
+}
+$(function(){
+	app.init();
+});
+</script>
+</body>
+</html>

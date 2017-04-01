@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jws.app.operater.data.ProbelmPayRecordMapper" >
+  <resultMap id="BaseResultMap" type="com.jws.app.operater.model.ProbelmPayRecord" >
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="probelemId" property="probelemid" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="payment_id" property="paymentId" jdbcType="VARCHAR" />
+    <result column="openid" property="openid" jdbcType="VARCHAR" />
+    <result column="payment_type" property="paymentType" jdbcType="INTEGER" />
+    <result column="payment_object" property="paymentObject" jdbcType="INTEGER" />
+    <result column="payment_status" property="paymentStatus" jdbcType="INTEGER" />
+    <result column="amount_money" property="amountMoney" jdbcType="DOUBLE" />
+    <result column="spare_field1" property="spareField1" jdbcType="VARCHAR" />
+    <result column="spare_field2" property="spareField2" jdbcType="VARCHAR" />
+    <result column="spare_field3" property="spareField3" jdbcType="VARCHAR" />
+    <result column="spare_field4" property="spareField4" jdbcType="VARCHAR" />
+    <result column="spare_field5" property="spareField5" jdbcType="VARCHAR" />
+  </resultMap>
+   
+  <insert id="insert" parameterType="com.jws.app.operater.model.ProbelmPayRecord" >
+    insert into tb_probelm_payment_record (id, probelemId, create_time, 
+      payment_id, openid, payment_type, 
+      payment_object, payment_status, amount_money, 
+      spare_field1, spare_field2, spare_field3, 
+      spare_field4, spare_field5)
+    values (#{id,jdbcType=INTEGER}, #{probelemid,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{paymentId,jdbcType=VARCHAR}, #{openid,jdbcType=VARCHAR}, #{paymentType,jdbcType=INTEGER}, 
+      #{paymentObject,jdbcType=INTEGER}, #{paymentStatus,jdbcType=INTEGER}, #{amountMoney,jdbcType=DOUBLE}, 
+      #{spareField1,jdbcType=VARCHAR}, #{spareField2,jdbcType=VARCHAR}, #{spareField3,jdbcType=VARCHAR}, 
+      #{spareField4,jdbcType=VARCHAR}, #{spareField5,jdbcType=VARCHAR})
+  </insert>
+  
+  
+  	 <select id="queryPayInfo" resultMap="BaseResultMap"  parameterType="map">			
+				SELECT * FROM tb_probelm_payment_record WHERE payment_status = '2'
+  </select>
+  
+  <select id="queryPayInfoPersion" resultMap="BaseResultMap"  parameterType="map">			
+				SELECT * FROM tb_probelm_payment_record WHERE payment_status = '2' AND openid = #{openid,jdbcType=VARCHAR}
+  </select>
+  
+   <update id="updatePayInfoPersion" parameterType="map">			
+			UPDATE tb_probelm_payment_record SET payment_status = '1' WHERE id =#{id,jdbcType=INTEGER}
+  </update>
+  
+    <select id="queryRespondentMoney" resultMap="BaseResultMap"  parameterType="map">			
+			SELECT * FROM  tb_probelm_payment_record WHERE openid = #{openid,jdbcType=VARCHAR} AND probelemId = #{probelemId,jdbcType=INTEGER} AND payment_type = '2'
+  </select>
+  
+    <select id="queryRespondentMoneyCount" resultType="int"  parameterType="map">			
+			 SELECT COUNT(*) FROM  tb_probelm_payment_record WHERE  probelemId = #{probelemId,jdbcType=INTEGER}
+  </select>
+ 
+</mapper>

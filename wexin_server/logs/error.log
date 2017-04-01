@@ -1,0 +1,2 @@
+160810 11:44:43,566 FATAL <com.cloopen.rest.sdk.utils.LoggerUtil.fatal(LoggerUtil.java:62)> 初始化异常:serverIP或serverPort为空
+160810 11:45:18,550 FATAL <com.cloopen.rest.sdk.utils.LoggerUtil.fatal(LoggerUtil.java:62)> 初始化异常:serverIP或serverPort为空

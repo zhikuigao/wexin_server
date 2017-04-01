@@ -1,0 +1,389 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="renderer" content="webkit">
+<meta name="format-detection" content="telephone=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<script type="text/javascript" src="/weixin/js/adaptive.js"></script>
+
+<link rel="stylesheet" type="text/css" href="/weixin/css/style.css"/>
+<script type="text/javascript" src="/weixin/js/jquery.min.js"></script>
+<script type="text/javascript" src="/weixin/js/fastclick.js"></script>
+<script type="text/javascript" src="/weixin/js/common.js"></script>
+<script type="text/javascript" src="/weixin/plugins/layer/layer.js"></script>
+
+<title>创伙伴·帮忙</title>
+</head>
+<body>
+<div class="body-wrap head-location">
+	<div class="person-info pd20 pb90">
+		<div class="info-box">		
+		</div>
+		<div class="account-balance">
+			<div class="t">账户余额<span class="num">68.89元</span></div>
+			余额每夜自动结算到微信钱包。
+		</div>
+		<div class="mine-tab">
+			<div class="tab-item active" data-index="1"><span class="w">我的提问</span></div>
+			<div class="tab-item" data-index="0"><span class="w">我的回答</span></div>
+			<div class="tab-item" data-index="2"><span class="w">我的帮忙</span></div>
+		</div>
+	</div>
+	<div class="pd20 show-list">
+	</div>
+</div>
+<footer>
+	<div class="fix-wrap">
+		<a href="index.html" class="item item1">
+			<div class="icon"></div>
+			首页
+		</a>
+		<div class="item item2 g-publish">
+			<div class="circle"></div>
+			<div class="con-wrap">
+				<div class="icon"></div>
+				发布
+			</div>
+		</div>
+		<a href="mine.html" class="item item3 active">
+			<div class="icon"></div>
+			我的
+		</a>
+	</div>
+	<div class="menu-box">
+		<div class="fix-shade"></div>
+		<div class="fix-close"></div>
+		<div class="pub-list">
+			<a href="weixinpay/publish.html?classId=问事" class="pub-item"><span class="pub-icon pub-icon1"></span>问事</a>
+			<a href="weixinpay/publish.html?classId=找人" class="pub-item"><span class="pub-icon pub-icon2"></span>找人</a>
+			<a href="weixinpay/publish.html?classId=任务" class="pub-item"><span class="pub-icon pub-icon3"></span>任务</a>
+		</div>
+	</div>
+</footer>
+<script type="text/javascript">
+var app = {
+	isMySelf:true,
+	curOpenid:openid,
+	temp1:	'<a href="help-detail.html?questId={problemId}" class="g-box-item" data-open="{openid}" data-id="{problemId}">'+
+				'<div class="p-info clearfix">'+
+					'<div class="head-wrap {isV}"><img src={photo} alt=""></div>'+
+					'<div class="in-wrap">'+
+						'<div class="name">{nickname}</div>'+
+						'<div class="from">'+
+							'<span class="company fc-aa dib">{company}</span>'+
+							'<span class="v-line dib"></span>'+
+							'<span class="position fc-aa dib">{post}</span>'+
+						'</div>'+
+					'</div>'+
+					'<div class="reward">{amountMoney}元</div>'+
+				'</div>'+
+				'<div class="demand"><span class="tag dib">{secondClassification}</span>{contentProblem}</div>'+
+				'<div class="handle-status clearfix">'+
+					'<div class="fl">'+
+						'<span class="fc-aa dib">{problemHelpCount}个伙伴在帮忙</span>'+
+						'<span class="v-line dib status-line"></span>'+
+						'<span class="fc-aa dib">{lastTime}</span>'+
+					'</div>'+
+					'{statusHtml}'+
+				'</div>'+
+			'</a>',
+	temp2:  '<a href="help-detail.html?questId={problemId}" class="g-box-item no-pinfo"  data-open="{openid}" data-id="{problemId}">'+
+				'<div class="demand"><span class="tag dib">{secondClassification}</span>{contentProblem}</div>'+
+				'<div class="handle-status clearfix">'+
+					'<div class="fl">'+
+						'<span class="fc-aa dib">{problemHelpCount}个伙伴在帮忙</span>'+
+						'<span class="v-line dib status-line"></span>'+
+						'<span class="fc-aa dib">{lastTime}</span>'+
+					'</div>'+
+					'{statusHtml}'+
+				'</div>'+
+			'</a>',
+	getStatusHtml:function(status){
+		switch(status){
+			case 3:
+			  return '<div class="status-btn fr">处理中</div>';
+			  break;
+			case 4:
+			  return '<div class="status-btn status-over fr">已搞定</div>';
+			  break;
+			case 5:
+			  return '<div class="status-btn status-timeout fr">已过期</div>';
+			  break;
+			default:
+			  return '';
+		}
+	},
+	expPersonInfo:function(){
+		var temp = 	'<a href="person-info-form.html" class="g-box-item"  data-open="{openid}">'+
+						'<div class="p-info clearfix">'+
+							'<div class="head-wrap {isV}"><img class="head-img" src="{photo}" alt=""></div>'+
+							'<div class="in-wrap">'+
+								'<div class="name">{nickname}'+'<span class="attestation no"></span>'+'</div>'+
+								'<div class="from">'+
+									'<span class="company fc-aa dib">{company}</span>'+
+									'<span class="v-line dib"></span>'+
+									'<span class="position fc-aa dib">{post}</span>'+
+								'</div>'+
+							'</div>'+
+						'</div>'+
+					'</a>';
+		/*页面初始化*/
+		var personInfo = getUserInfo(app.curOpenid);
+		
+		if(!personInfo)return;
+
+		if(app.isMySelf){
+
+			if(!personInfo.spareField2||personInfo.spareField2==''){
+				$(".account-balance .num").html("");
+			}else{
+				$(".account-balance .num").html(personInfo.spareField2+"元");
+			}
+
+		}else{
+			$(".account-balance").remove();
+			$(".tab-item:last").hide();
+			$(".tab-item").each(function(){
+				$(this).find(".w").text($(this).find(".w").text().replace("我","他"));
+			});
+		}
+		
+		var newTemp = temp;
+
+		
+		if(!personInfo.company&&!personInfo.post){
+			var newTemp = temp.replace('<span class="company fc-aa dib">{company}</span>'+
+							'<span class="v-line dib"></span><span class="position fc-aa dib">{post}</span>','');
+		}else{
+			if(!personInfo.company){
+				var newTemp = temp.replace('<span class="company fc-aa dib">{company}</span>'+
+								'<span class="v-line dib"></span>','');
+				
+			}
+			if(!personInfo.post){
+				var newTemp = temp.replace('<span class="v-line dib"></span>'+
+								'<span class="position fc-aa dib">{post}</span>','');
+			}
+		}
+		personInfo.isV = parseInt(personInfo.spareField1)==2?"v":"";
+
+		var info = newTemp.Format(personInfo);
+		$(".info-box").html(info);
+		switch(parseInt(personInfo.spareField1)){
+			case 2:
+				$(".attestation").removeClass("no");
+				break;
+			default:
+				$(".attestation").addClass("no");
+		}
+	},
+	getMyQuestion:function(openid){
+		var url = root_+"/weixin/entry/interfaceEntry.do?paramObject";
+		
+		var openid = openid;
+		var data = {
+			busiCode:"queryProblemInfo",
+			openid:openid
+		}
+		new SelfAjax({
+			url:url,
+			data:data,
+			success:function(data){
+				if(data.resultDesc){
+					app.showList(data.resultDesc);
+					console.log(data.resultDesc);
+				}else{
+					alert("程序异常");
+				}
+			},
+			error:function(errorMsg){
+				alert(msg);
+			}
+		});
+	},
+	expMyList:function(dataArr,temp){
+		
+		for(var i=0,len=dataArr.length;i<len;i++){
+			var newTemp = temp;
+			var data = dataArr[i];
+
+			var problemHelpCount = data.problemHelpCount;/*当前问题帮忙人数*/
+			var questInfo = data.problemDesc;/*当前问题详情*/
+
+			var lastTime = dateFormat(questInfo.lastTime);/*当前问题结束时间*/
+			var thisOpenid = questInfo.openid;
+			var personInfo = getUserInfo(thisOpenid);/*当前问题关联个人信息*/
+			
+
+			if(!lastTime){
+				lastTime = '';
+				newTemp = newTemp.replace('<span class="v-line dib"></span>'+
+							'<span class="fc-aa dib">{lastTime}</span>','');
+			}else if(lastTime.t>0){
+				if(lastTime.days>0){
+					var lt = {
+						d:lastTime.days<=0?"":lastTime.days+"天"
+					}
+					var limitTime = "剩余"+lt.d;
+				}else{
+					var lt = {
+						d:lastTime.days<=0?"":lastTime.days+"天",
+						h:lastTime.h<=0?"":lastTime.h+"小时",
+						m:lastTime.m<=0?"":lastTime.m+"分钟"
+					}
+					var limitTime = "剩余"+lt.d+lt.h+lt.m;
+				}
+				
+			}else{
+				limitTime = "";
+				newTemp = newTemp.replace('<span class="v-line dib status-line"></span>','');
+
+			}
+			questInfo.lastTime = limitTime;
+			
+			var statusHtml = app.getStatusHtml(questInfo.statusProblem);
+			var htmlObj ={
+				problemHelpCount:problemHelpCount,
+				problemId:data.questId,
+				statusHtml : statusHtml
+			}
+			
+			var resultObj = $.extend(true,{},htmlObj,personInfo,questInfo);
+			personInfo.spareField1==="2" ? resultObj.isV = "v" : resultObj.isV = "";
+
+			if(!resultObj.company&&!resultObj.post){
+					newTemp = newTemp.replace('<span class="company fc-aa dib">{company}</span>'+
+								'<span class="v-line dib"></span><span class="position fc-aa dib">{post}</span>','');
+			}else{
+				if(!resultObj.company){
+						newTemp = newTemp.replace('<span class="company fc-aa dib">{company}</span>'+
+									'<span class="v-line dib"></span>','');
+					
+				}
+				if(!resultObj.post){
+						newTemp = newTemp.replace('<span class="v-line dib"></span>'+
+									'<span class="position fc-aa dib">{post}</span>','');
+				}
+			}
+			var resultObj = firstClassWordHandle(resultObj);
+			html = newTemp.Format(resultObj);
+			
+			$(".show-list").append(html);
+
+		}
+				
+	},
+	showList:function(data){
+		var tab1Obj = data.problemKillData;
+		var tab2Obj = data.problemData;
+		var tab3Obj = data.problemShareData;
+
+		var totalObj = [];
+		totalObj.push(tab1Obj,tab2Obj,tab3Obj);
+
+		app.changeHtml(totalObj,$(".tab-item:eq(0)").attr("data-index"));
+		$(".mine-tab").on("click",".tab-item",function(){
+			$(".show-list").html('');
+			var tabIndex = $(this).attr("data-index");
+			$(this).addClass("active").siblings().removeClass("active");
+
+			app.changeHtml(totalObj,tabIndex);
+		});
+		
+		
+	},
+	changeHtml:function(totalObj,tabIndex){
+		var curObj = totalObj[tabIndex];
+		var url = root_+"/weixin/entry/interfaceEntry.do?paramObject";
+
+		var temp = tabIndex==1?app.temp2 : app.temp1;
+
+		if(curObj.length>0){	
+			var detailArr = [];
+			for(var i=0,len=curObj.length;i<len;i++){
+				var html='';
+				var questId = tabIndex==1?curObj[i].id : curObj[i].probelemid;
+				
+				(function(questId){
+					var returnVal;
+					var data = {
+						busiCode:"queryProblemDesc",
+						id:questId
+					}
+					new SelfAjax({
+						url:url,
+						data:data,
+						async:false,
+						success:function(data){
+							if(data.result.code!=1){
+								alert(data.result.desc);
+							}else{
+								returnVal = data.resultDesc;
+
+								if(!returnVal.problemDesc.statusProblem){
+									return false;
+								}
+								returnVal.questId = questId;
+
+								detailArr.push(returnVal);
+							}
+						},
+						error:function(){}
+					});
+				})(questId);
+				/*获取问题信息*/
+
+			}
+			
+			/*JSON排序问题，待解决*/
+			detailArr = detailArr.sort(function(x,y){
+				var xKey = x.problemKillrecord;
+				var yKey = y.problemKillrecord;
+				
+				if(xKey.length<1|| yKey.length<1){
+					return 1;
+				}
+				var a = Date.parse(xKey[xKey.length-1].createTime||"");
+				var b = Date.parse(yKey[yKey.length-1].createTime||"");
+
+				return a-b ? -1:1; 
+			});
+			if(!detailArr){
+				return false;
+			}
+			app.expMyList(detailArr,temp);
+			$(".no-data").hide();
+			
+		}else{
+			$(".show-list").html(noDataHtml);
+		}
+	},
+	init:function(){
+
+		app.curOpenid = !GetRequest().openid? openid : GetRequest().openid;
+
+		if(GetRequest().isMySelf||GetRequest().isMySelf === "false"){
+			app.isMySelf = false;
+		}
+
+		var isRegister = getRegisterStatus();
+		if(!isRegister)return false;
+
+		this.expPersonInfo();
+		this.getMyQuestion(app.curOpenid);
+
+		if(!app.isMySelf){
+			$(".person-info .p-info").addClass("no-icon");
+			$(".person-info a").on("click",function(){return false;});
+		}
+	}
+}
+$(function(){
+	app.init();
+});
+</script>
+</body>
+</html>

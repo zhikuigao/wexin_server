@@ -1,0 +1,245 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="renderer" content="webkit">
+<meta name="format-detection" content="telephone=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<script type="text/javascript" src="/weixin/js/adaptive.js"></script>
+
+<link rel="stylesheet" type="text/css" href="/weixin/css/style.css"/>
+<link rel="stylesheet" type="text/css" href="/weixin/css/dropload.css"/>
+<script type="text/javascript" src="/weixin/js/jquery.min.js"></script>
+<script type="text/javascript" src="/weixin/js/fastclick.js"></script>
+<script type="text/javascript" src="/weixin/js/common.js"></script>
+<script type="text/javascript" src="/weixin/plugins/layer/layer.js"></script>
+<script type="text/javascript" src="/weixin/js/dropload.min.js"></script>
+
+<title>创伙伴·帮忙</title>
+</head>
+<body>
+<div class="body-wrap pd20 head-location">
+	<div class="quest-list">
+			
+	</div>
+</div>
+<footer>
+	<div class="fix-wrap">
+		<a href="index.html" class="item item1 active">
+			<div class="icon"></div>
+			首页
+		</a>
+		<div class="item item2 g-publish">
+			<div class="circle"></div>
+			<div class="con-wrap">
+				<div class="icon"></div>
+				发布
+			</div>
+		</div>
+		<a href="mine.html" class="item item3">
+			<div class="icon"></div>
+			我的
+		</a>
+	</div>
+	<div class="menu-box">
+		<div class="fix-shade"></div>
+		<div class="fix-close"></div>
+		<div class="pub-list">
+			<a href="weixinpay/publish.html?classId=问事" class="pub-item"><span class="pub-icon pub-icon1"></span>问事</a>
+			<a href="weixinpay/publish.html?classId=找人" class="pub-item"><span class="pub-icon pub-icon2"></span>找人</a>
+			<a href="weixinpay/publish.html?classId=任务" class="pub-item"><span class="pub-icon pub-icon3"></span>任务</a>
+		</div>
+	</div>
+</footer>
+<script type="text/javascript">	
+var app = {
+	pages:{
+		num:0,
+		total:0
+	},
+	temp: 	'<a href="help-detail.html?questId={id}&shareId='+openid+'" class="g-box-item swiper-slide" data-open="{openid}" data-id="{id}">'+
+				'<div class="p-info clearfix">'+
+					'<div class="head-wrap {isV}"><img src={photo} alt=""></div>'+
+					'<div class="in-wrap">'+
+						'<div class="name">{nickname}</div>'+
+						'<div class="from">'+
+							'<span class="company fc-aa dib">{company}</span>'+
+							'<span class="v-line dib"></span>'+
+							'<span class="position fc-aa dib">{post}</span>'+
+						'</div>'+
+					'</div>'+
+					'<div class="reward">{amountMoney}元</div>'+
+				'</div>'+
+				'<div class="demand"><span class="tag dib">{secondClassification}</span>{contentProblem}</div>'+
+				'<div class="handle-status clearfix">'+
+					'<div class="fl">'+
+						'<span class="fc-aa dib">{spareField1}个伙伴在帮忙</span>'+
+						'<span class="v-line dib"></span>'+
+						'<span class="fc-aa dib">{lastTime}</span>'+
+					'</div>'+
+					'{statusHtml}'+
+				'</div>'+
+			'</a>',
+	getList:function(page,pageNum){
+		var url = root_+"/weixin/entry/interfaceEntry.do?paramObject";
+		var data = {
+			busiCode:"queryProblemlist",
+			page:page,
+			pageNum:pageNum
+		}
+		var result;
+		new SelfAjax({
+			url:url,
+			data:data,
+			async:false,
+			success:function(data){
+				console.log(data);
+				var status = data.result;
+				if(status.code == 1){
+					result = data;
+					app.pages.total = data.resultDesc.total;
+				}else{
+					alert(status.desc);
+				}
+			},
+			error:function(errorMsg){
+				alert(errorMsg);
+			}
+		});
+		result.page = page;
+		return result;
+	},
+	dataFormat:function(data){
+		var temp = app.temp;
+		var page = data.page;
+		var data = data.resultDesc.problemList;
+		if(data.length==0){
+			$(".body-wrap").append(noDataHtml);
+			$(".load-more").hide();
+			return false;
+		}
+		var onePageHtml = '';
+
+		for(var i=0,len=data.length;i<len;i++){
+			var resultObj = data[i];
+
+			var statusHtml = app.getStatusHtml(resultObj.statusProblem);	
+			resultObj.statusHtml = statusHtml;
+			var personInfo = getUserInfo(resultObj.openid);
+
+			resultObj.photo = personInfo.photo;
+			resultObj.company = personInfo.company;
+			resultObj.post = personInfo.post;
+			resultObj.nickname = personInfo.nickname;
+
+			personInfo.spareField1==="2" ? resultObj.isV = "v" : resultObj.isV = "";
+				
+
+			var newTemp = temp;
+			
+			if(!personInfo.company&&!personInfo.post){
+				var newTemp = temp.replace('<span class="company fc-aa dib">{company}</span>'+
+								'<span class="v-line dib"></span><span class="position fc-aa dib">{post}</span>','');
+			}else{
+				if(!personInfo.company){
+					var newTemp = temp.replace('<span class="company fc-aa dib">{company}</span>'+
+									'<span class="v-line dib"></span>','');
+					
+				}
+				if(!personInfo.post){
+					var newTemp = temp.replace('<span class="v-line dib"></span>'+
+									'<span class="position fc-aa dib">{post}</span>','');
+				}
+			}
+			
+			var lastTime = dateFormat(resultObj.lastTime);
+
+			if(lastTime.t<0){
+				resultObj.lastTime = '';
+			}else{
+				if(lastTime.days>0){
+					var lt = {
+						d:lastTime.days<=0?"":lastTime.days+"天"
+					}
+					var limitTime = "剩余"+lt.d;
+				}else{
+					var lt = {
+						d:lastTime.days<=0?"":lastTime.days+"天",
+						h:lastTime.h<=0?"":lastTime.h+"小时",
+						m:lastTime.m<=0?"":lastTime.m+"分钟"
+					}
+					var limitTime = "剩余"+lt.d+lt.h+lt.m;
+				}
+				
+				resultObj.lastTime = limitTime;
+			}
+			var resultObj = firstClassWordHandle(resultObj);
+
+			onePageHtml += newTemp.Format(resultObj);
+
+		}
+		if(app.pages.total>10){
+			onePageHtml+='<div class="load-more" data-page="'+(page+10)+'">获取更多</div>';
+		}
+		$(".quest-list").append(onePageHtml);
+		
+		
+	},
+	getStatusHtml:function(status){
+		switch(status){
+			case 3:
+			  return '<div class="status-btn fr">处理中</div>';
+			  break;
+			case 4:
+			  return '<div class="status-btn status-over fr">已搞定</div>';
+			  break;
+			case 5:
+			  return '<div class="status-btn status-timeout fr">已过期</div>';
+			  break;
+			default:
+			  return '';
+		}
+	},
+	eventBind:function(){
+		$(document).on("click",".load-more",function(){
+
+			var page = $(this).attr("data-page");
+			
+			var dataList = app.getList(parseInt(page),10);
+			var dataListLen = dataList.resultDesc.problemList.length;
+			if(dataListLen <= 0){
+				$(".load-more").html("内容加载完毕...").fadeOut(1000);
+				return false;
+			}else{
+				app.dataFormat(dataList);
+				$(this).remove();
+			}
+		});
+	},
+	swiperInit:function(){
+		
+	},
+	init:function(){
+		var param = GetRequest();
+
+		if(!param.openid&&!sessionStorage.openid){
+			alert("程序异常");
+		}else{
+			var openid = param.openid?param.openid:sessionStorage.openid;
+			sessionStorage.openid = openid;
+		}
+
+		var dataList = app.getList(0,10);
+		app.dataFormat(dataList);
+		app.eventBind();
+		app.swiperInit();
+	}
+}
+$(function(){
+	app.init();
+});
+</script>
+</body>
+</html>

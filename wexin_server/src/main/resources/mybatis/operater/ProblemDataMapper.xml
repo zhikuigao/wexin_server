@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jws.app.operater.data.ProblemDataMapper" >
+  <resultMap id="BaseResultMap" type="com.jws.app.operater.model.ProblemData" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="first_classification" property="firstClassification" jdbcType="VARCHAR" />
+    <result column="second_classification" property="secondClassification" jdbcType="VARCHAR" />
+    <result column="content_problem" property="contentProblem" jdbcType="VARCHAR" />
+    <result column="status_problem" property="statusProblem" jdbcType="INTEGER" />
+    <result column="openid" property="openid" jdbcType="VARCHAR" />
+    <result column="mobile_phone" property="mobilePhone" jdbcType="VARCHAR" />
+    <result column="amount_money" property="amountMoney" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="last_time" property="lastTime" jdbcType="TIMESTAMP" />
+    <result column="spare_field1" property="spareField1" jdbcType="VARCHAR" />
+    <result column="spare_field2" property="spareField2" jdbcType="VARCHAR" />
+    <result column="spare_field3" property="spareField3" jdbcType="VARCHAR" />
+    <result column="spare_field4" property="spareField4" jdbcType="VARCHAR" />
+    <result column="spare_field5" property="spareField5" jdbcType="VARCHAR" />
+  </resultMap>
+  
+
+  <insert id="insert" parameterType="com.jws.app.operater.model.ProblemData" >
+    insert into tb_problem_data (id, first_classification, second_classification, 
+      content_problem, status_problem, openid, 
+      mobile_phone, amount_money, create_time, 
+      last_time, spare_field1, spare_field2, 
+      spare_field3, spare_field4, spare_field5
+      )
+    values (#{id,jdbcType=INTEGER}, #{firstClassification,jdbcType=VARCHAR}, #{secondClassification,jdbcType=VARCHAR}, 
+      #{contentProblem,jdbcType=VARCHAR}, #{statusProblem,jdbcType=INTEGER}, #{openid,jdbcType=VARCHAR}, 
+      #{mobilePhone,jdbcType=VARCHAR}, #{amountMoney,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{lastTime,jdbcType=TIMESTAMP}, #{spareField1,jdbcType=VARCHAR}, #{spareField2,jdbcType=VARCHAR}, 
+      #{spareField3,jdbcType=VARCHAR}, #{spareField4,jdbcType=VARCHAR}, #{spareField5,jdbcType=VARCHAR}
+      )
+  </insert>
+  
+    <select id="queryProblemlist" resultMap="BaseResultMap"  parameterType="map">	
+			SELECT * FROM tb_problem_data WHERE (status_problem = '1' OR '2' OR '3' OR '4') AND last_time>NOW() ORDER BY create_time DESC LIMIT #{page,jdbcType=INTEGER},#{pageNum,jdbcType=INTEGER}
+  </select>
+  
+  <select id="queryProblemAll" resultMap="BaseResultMap"  parameterType="map">	
+			SELECT * FROM tb_problem_data ORDER BY create_time DESC LIMIT #{page,jdbcType=INTEGER},#{pageNum,jdbcType=INTEGER}
+  </select>
+  
+    <select id="queryProblemAllCount" resultType="int"  parameterType="map">	
+			SELECT COUNT(*) FROM tb_problem_data 
+  </select>
+  
+   <select id="queryProblemlistCount" resultType="int"  parameterType="map">	
+			SELECT COUNT(*) FROM tb_problem_data WHERE (status_problem = '1' OR '2' OR '3' OR '4') AND last_time>NOW() 
+  </select>
+  
+    <update id="updateProStatus"   parameterType="map">	
+			UPDATE tb_problem_data SET status_problem = #{statusProblem,jdbcType=INTEGER} WHERE id  = #{id,jdbcType=INTEGER}
+  </update>
+  
+      <select id="queryProblemInfo" resultMap="BaseResultMap"  parameterType="map">			
+			SELECT * FROM tb_problem_data WHERE openid = #{openid,jdbcType=VARCHAR}
+  </select>
+	
+	
+	     <select id="queryProblemDesc" resultMap="BaseResultMap"  parameterType="map">			
+			SELECT * FROM tb_problem_data WHERE id = #{id,jdbcType=VARCHAR}
+  </select>
+  
+  	     <select id="queryPrimarkeyId" resultType="int"  parameterType="map">			
+				SELECT id FROM tb_problem_data WHERE openid = #{openid,jdbcType=VARCHAR} AND amount_money = #{money,jdbcType=VARCHAR} AND spare_field2 = #{sf,jdbcType=VARCHAR} AND content_problem = #{content,jdbcType=VARCHAR}  ORDER BY create_time DESC LIMIT 0,1
+  </select>
+  
+	    <select id="queryBalanceDisplay" resultMap="BaseResultMap"  parameterType="map">			
+			SELECT * FROM tb_problem_data WHERE openid = #{openid,jdbcType=VARCHAR} AND (status_problem = '1' OR  status_problem= '2' OR  status_problem= '3' OR status_problem = '5')
+  </select>
+  
+     <select id="queryBalanceExtract" resultMap="BaseResultMap"  parameterType="map">			
+				SELECT * FROM tb_problem_data WHERE openid = #{openid,jdbcType=VARCHAR} AND (status_problem = '1' OR  status_problem= '2' ) AND  NOW() >last_time 
+  </select>
+
+     <select id="queryCountShare" resultType="int"  parameterType="map">			
+				SELECT COUNT(*) FROM tb_problem_share_record WHERE probelemId = #{probelemId,jdbcType=INTEGER}
+  </select>
+
+	 <select id="querySf2" resultType="String"  parameterType="map">			
+				SELECT spare_field2 FROM tb_problem_data WHERE id = #{id,jdbcType=VARCHAR}
+  </select>
+  
+   <select id="queryOverdueProblem" resultMap="BaseResultMap"  parameterType="map">			
+		SELECT * FROM tb_problem_data WHERE  (status_problem = '1' OR  status_problem= '2'  OR  status_problem= '3' ) AND  NOW() >last_time 
+  </select>
+  <update id="updateByPrimaryKey" parameterType="com.jws.app.operater.model.ProblemData" >
+    update tb_problem_data
+    set content_problem = #{contentProblem,jdbcType=VARCHAR},
+      openid = #{openid,jdbcType=VARCHAR},
+      amount_money = #{amountMoney,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+ 
+</mapper>

@@ -1,0 +1,275 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="renderer" content="webkit">
+
+<meta name="format-detection" content="telephone=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<script type="text/javascript" src="/weiixin/js/adaptive.js"></script>
+
+<link rel="stylesheet" type="text/css" href="/weiixin/css/style.css"/>
+<script type="text/javascript" src="/weiixin/js/jquery.min.js"></script>
+<script type="text/javascript" src="/weiixin/js/fastclick.js"></script>
+<script type="text/javascript" src="/weiixin/js/common.js"></script>
+<script type="text/javascript" src="/weiixin/plugins/layer/layer.js"></script>
+
+<title>创伙伴-发布</title>
+</head>
+<body>
+<div class="body-wrap publish">
+	<div class="g-tab">
+		<!-- <div class="tab-item active"><span class="w-wrap">找人</span></div>
+		<div class="tab-item"><span class="w-wrap">问事</span></div>
+		<div class="tab-item"><span class="w-wrap">任务</span></div> -->
+	</div>
+	<div class="pd20">
+		<div class="tag-list">
+			<div class="item-wrap">
+				<div class="tag-item active">创业</div>
+				<div class="tag-item">投资</div>
+				<div class="tag-item">职场</div>
+				<div class="tag-item">生活</div>
+				<div class="tag-item">生活</div>
+				<div class="tag-item">生活</div>
+				<div class="tag-item">生活</div>
+			</div>
+			<div class="tag-item more">更多</div>
+		</div>
+		<div class="g-textarea-wrap">
+			<textarea id="send-content" data-maxLen="140" class="textarea inputLimit" placeholder="我是XXX，我想要XXX"></textarea>
+			<span class="tips">140字</span>
+		</div>
+		<input id="phone" type="text" placeholder="手机" class="input">
+		<input id="wechat" type="text" placeholder="微信号" class="input">
+
+		<div class="award-item award-num">
+			<input type="hidden" class="hidden-val">
+			<div class="sec-t">悬赏金额：<span class="g-ftcolor1"><span class="change-num">0</span>元</span></div>
+			<div class="g-progress">
+				<div data-val="50" class="progress-item"><span class="circle"></span><div class="word">50</div></div>
+				<div data-val="100" class="progress-item"><span class="circle"></span><div class="word">100</div></div>
+				<div data-val="200" class="progress-item"><span class="circle"></span><div class="word">200</div></div>
+				<div data-val="500" class="progress-item"><span class="circle"></span><div class="word">500</div></div>
+				<div data-val="其他" class="progress-item progress-other"><span class="circle"></span><div class="word">其他</div></div>
+			</div>
+
+			<div class="other-input">
+				<input type="number" placeholder="请输入悬赏金额" class="input">
+			</div>
+		</div>
+
+		<div class="award-item award-time">
+			<input type="hidden" class="hidden-val">
+			<div class="sec-t">悬赏期限：<span class="g-ftcolor1"><span class="change-num">0</span>天</span></div>
+			<div class="g-progress">
+				<div data-val="1" class="progress-item"><span class="circle"></span><div class="word">1天</div></div>
+				<div data-val="2" class="progress-item"><span class="circle"></span><div class="word">2天</div></div>
+				<div data-val="3" class="progress-item "><span class="circle"></span><div class="word">3天</div></div>
+			</div>
+		</div>
+	</div>
+	<div class="fix-btn">
+		<div class="fix-wrap">
+			<div href="help-detail.html" class="submit fix-btn-item">发布</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+$(function(){
+	var classifyData;
+	
+	function refreshTab(obj){
+		var temp = 	'<div class="tab-item" data-tab="{name}"><span class="w-wrap">{name}</span></div>';
+		var html='';
+		for(var i=0,len=obj.length;i<len;i++){
+			html+=temp.Format(obj[i]);
+		}
+		$(".g-tab").html(html);
+	}
+	
+	function initTabActive(data){
+		var wlhash = window.location.hash;
+
+		if($.trim(wlhash) && $.trim(wlhash) != '#'){
+			wlhash = wlhash.substr(1,wlhash.length);
+			$(".g-tab").find(".tab-item").eq(wlhash.substr(1,wlhash.length)-1).addClass("active");
+		}
+
+		changeTag();
+	}
+
+	function changeTag(obj){
+		var obj = obj||classifyData;
+		var activeTab;
+		$(".tab-item").each(function(index){
+			if($(this).hasClass("active")){
+				activeTab = $(this).attr("data-tab");
+			}
+		});
+
+		var temp = '<div class="tag-item"></div>';
+		var html='';
+		var tagObj = obj[activeTab];
+		
+		for(var i=0,len=tagObj.length;i<len;i++){
+			html+='<div class="tag-item" data-tag="'+tagObj[i]+'">'+tagObj[i]+'</div>';
+		}
+
+		$(".tag-list .item-wrap").html(html);
+
+		if($(".tag-item").length<=5){
+			$(".tag-item.more").hide();
+		}else{
+			$(".tag-item.more").show();
+		}
+	}
+	
+
+	function getQuestList(){
+		var url = root_+"/weiixin/entry/interfaceEntry.do?paramObject";
+		var data = {
+			busiCode:"queryProData"
+		}
+		new SelfAjax({
+			url:url,
+			data:data,
+			success:function(data){
+				classifyData = data.resultDesc;
+				var firstClass = [];
+				for(var i in classifyData){
+					firstClass.push({name:i});
+				}
+				refreshTab(firstClass);
+				initTabActive(classifyData);
+			}
+		});	
+	}
+	getQuestList();
+
+	$(".submit").on("click",function(){
+		var data = formVerify();
+		if(!data)return false;	
+		var url = root_+"/weiixin/entry/interfaceEntry.do?paramObject";
+		
+		/*var data = {
+			    busiCode:"addProblem",
+			    openid:"ceshi",
+			    firstClass:"问题",
+			    secondClass:"八卦",
+			    content:"测试内容",
+			    money:"500",
+			    lastTime:"2016-08-06 11:11:24"
+			}*/
+		new SelfAjax({
+			url:url,
+			data:data,
+			success:function(data){
+				if(data.result.code==1){
+					showInfoDialog(1,"帮忙信息发布成功<br>请等待伙伴们帮忙");
+					setTimeout(function(){
+						location.href="help-detail.html";
+					},3000);
+					
+				}else{
+					alert(data.result.desc);
+					showInfoDialog(0,"帮忙信息发布失败","3秒后返回重新发布");	
+					setTimeout(function(){
+						location.reload();
+					},3000);
+				}
+				
+			}
+		});
+	});
+
+	function formVerify(){
+		var firstClass = $(".tab-item.active").attr("data-tab");
+		var secondClass = $(".tag-item.active").attr("data-tag");
+		if(!secondClass){
+			alert("请选择类型");
+			return
+		}
+
+		var content = $("#send-content").val();	
+		if(!content){
+			alert("请输入内容");
+			return
+		}
+
+		var awardNum = $(".award-num .hidden-val").val();
+		if(!awardNum){
+			alert("请选择悬赏金额");
+			return
+		}else if(isNaN(awardNum)){
+			alert("请选择正确格式的数据");
+		}
+
+		var awardTime = $(".award-time .hidden-val").val();
+		if(!awardTime){
+			alert("请选择悬赏到期时间");
+			return
+		}
+
+		var phone = $("#phonet").val();
+		var wechat = $("#wechat").val();
+
+		var data = {
+			busiCode:"addProblem",
+		    openid:openid||"ceshi",
+		    ticket:"",
+		    firstClass:firstClass,
+		    secondClass:secondClass,
+		    content:content,
+		    money:awardNum,
+		    lastTime:"2016-08-06 11:11:24"
+		}
+		return data;
+	}
+
+	/*事件绑定*/
+	$(".g-tab").on("click",".tab-item",function(){
+		$(this).addClass("active").siblings(".tab-item").removeClass("active");
+		changeTag();
+	});
+	$(".tag-list").on("click",".tag-item:not(.more)",function(){
+		$(this).addClass("active").siblings(".tag-item").removeClass("active");
+	});
+	$(".tag-list .more").on("click",function(){
+		$(this).parents(".tag-list").toggleClass("unfold");
+	});
+
+	var maxWord = $(".inputLimit").attr("data-maxLen");
+	$(".inputLimit").on("input propertychange",function(){
+		var thisVal = $(this).val(),
+			thisLen = thisVal.length;
+		var num = maxWord-thisLen;
+		$(this).siblings(".tips").html(num+"字");
+		if(num<=0){
+			$(this).val(thisVal.substr(0,maxWord-1));
+			return false;
+		}
+	});
+
+	$(".award-item").on("click",".progress-item",function(){
+		var thisItem = $(this).parents(".award-item ");
+
+		if($(this).hasClass("progress-other")){
+			thisItem.find(".other-input").slideDown();
+		}else{
+			var thisVal = thisItem.find(".hidden-val").val();
+			thisItem.find(".change-num").text(thisVal);
+		}
+	});
+
+	$(".other-input input").on("input propertychange",function(){
+		var thisVal = $(this).val();
+		$(this).parents(".award-item ").find(".change-num").text(thisVal);
+		$(this).parents(".award-item ").find(".hidden-val").val(thisVal);
+	});
+});
+</script>
+</body>
+</html>

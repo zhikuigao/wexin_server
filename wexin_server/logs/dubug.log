@@ -1,0 +1,1 @@
+160921 14:42:05,094 INFO  <com.cloopen.rest.sdk.utils.LoggerUtil.info(LoggerUtil.java:44)> Wed Sep 21 14:42:05 CST 2016 sendTemplateSMS url = https://app.cloopen.com:8883/2013-12-26/Accounts/8aaf07085635aae501564adc8d5f0d65/SMS/TemplateSMS?sig=718F26A12B40448B21405D1BFA81C3B4

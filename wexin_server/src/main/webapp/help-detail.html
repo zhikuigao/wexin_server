@@ -1,0 +1,741 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="renderer" content="webkit">
+
+<meta name="format-detection" content="telephone=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<script type="text/javascript" src="/weixin/js/adaptive.js"></script>
+
+<link rel="stylesheet" type="text/css" href="/weixin/css/style.css"/>
+<script type="text/javascript" src="/weixin/js/jquery.min.js"></script>
+<script type="text/javascript" src="/weixin/js/fastclick.js"></script>
+<script type="text/javascript" src="/weixin/js/common.js"></script>
+<script type="text/javascript" src="/weixin/plugins/layer/layer.js"></script>
+
+<title>创伙伴·帮忙</title>
+</head>
+<body>
+<div class="body-wrap help-detail pd20 head-location">
+	<div class="info">
+		
+	</div>
+	<div class="g-progress no-last size54 disEditAbled">
+		<div class="progress-item">
+			<span class="circle">
+				<span class="icon icon1"></span>
+			</span>
+			<div class="word">发布</div>
+		</div>
+		<div class="progress-item">
+			<span class="circle">
+				<span class="icon icon2"></span>
+			</span>
+			<div class="word">帮忙</div>
+		</div>
+		<div class="progress-item">
+			<span class="circle">
+				<span class="icon icon3"></span>
+			</span>
+			<div class="word">处理</div>
+		</div>
+		<div class="progress-item">
+			<span class="circle">
+				<span class="icon icon4"></span>
+			</span>
+			<div class="word">搞定</div>
+		</div>
+	</div>
+
+	<div class="handle-status-box">
+		<div class="status-left">
+			等待处理
+		</div>
+		<div class="status-right">
+			<div class="help-num"></div>
+			<div class="help-time"></div>
+		</div>
+	</div>
+	<div class="resolve-info">
+
+	</div>
+	
+	<div class="use-guide">
+		<a class="use-guide-item" href="" id="suggest">投诉举报</a>
+		<a class="use-guide-item" href="use-help.html">使用帮助</a>
+	</div>
+
+	<footer>
+
+	</footer>
+</div>
+<div class="g-dialog share-dialog hide">
+	<div class="g-dialog-mask"></div>
+	<div class="g-dialog-content">
+		<!-- <img src="images/share-test.jpg" alt=""> -->
+	</div>
+	<div class="share-tips">长按保存图片，找朋友一起帮忙。</div>
+	<div class="g-dialog-close"></div>
+</div>
+<div class="g-dialog login-dialog hide">
+	<div class="g-dialog-mask"></div>
+	<div class="g-dialog-content login">
+		<!-- <img src="images/share-test.jpg" alt=""> -->
+		<div class="head-wrap"><img src="images/head.png" alt=""></div>
+		<div class="tips txtc lh1">请先验证你的手机号</div>
+		<div class="form-wrap">
+			<div class="item">
+				<input class="input" type="text" id="phone" placeholder="输入你的手机号">
+			</div>
+			<div class="item">
+				<input id="code" class="input box-flex1 mr20" type="text" name="username" placeholder="输入验证码">
+				<div class="getcode input">发送验证码</div>
+			</div>
+			<div class="item">
+				<input id="submit" type="submit" value="登录" class="submit btn-highlight1 input">	
+			</div>
+		</div>
+	</div>
+	<div class="g-dialog-close"></div>
+</div>
+<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<script type="text/javascript">
+var app = {
+	questId:GetRequest().questId,
+	urlParam:GetRequest(),
+	openid:openid,
+	openidBy:"",
+	killeropenid:"",
+	problemStatus:1,
+	secondClassification:"",
+	content:"",
+	getOwnerInfoHtml:function(){
+		return 	'<div class="g-box-item" data-id="{id}"  data-open="{openid}">'+
+					'<div class="p-info clearfix">'+
+						'<div class="head-wrap {isV}"><img src={photo} alt=""></div>'+
+						'<div class="in-wrap">'+
+							'<div class="name">{nickname}</div>'+
+							'<div class="from">'+
+								'<span class="company fc-aa dib">{company}</span>'+
+								'<span class="v-line dib"></span>'+
+								'<span class="position fc-aa dib">{post}</span>'+
+							'</div>'+
+						'</div>'+
+						'<div class="reward">{amountMoney}元</div>'+
+					'</div>'+
+					'<div class="demand"><span class="tag dib">{secondClassification}</span>{contentProblem}</div>'+
+				'</div>';
+	},
+	dataFormat:function(data){
+		console.log(data);
+		var temp = this.getOwnerInfoHtml();
+		var questData = data.problemDesc,/*问题数据*/
+			questOwner = questData.openid;/*问题拥有者*/	
+
+		var questResolveInfo = data.problemKillrecord;/*问题解决信息*/
+		var helpCount = data.problemHelpCount;/*帮忙人数*/
+
+		if(!questData.openid||questData.openid==""){
+			/*这里处理分享页面进来获取openid*/
+			var thisOpenid = param.openid;
+			sessionStorage.openid = thisOpenid;
+		}else{
+			var thisOpenid = questData.openid;
+		}
+		
+		var personInfo = getUserInfo(thisOpenid);/*通过openid获取信息*/
+		
+		if(!personInfo)return;
+		var resultObj = $.extend({"questOwner":questOwner},personInfo,questData);
+
+		personInfo.spareField1==="2" ? resultObj.isV = "v" : resultObj.isV = "";
+
+		if(!resultObj.company&&!resultObj.post){
+			var temp = temp.replace('<span class="company fc-aa dib">{company}</span>'+
+							'<span class="v-line dib"></span><span class="position fc-aa dib">{post}</span>','');
+		}else{
+			if(!resultObj.company){
+				var temp = temp.replace('<span class="company fc-aa dib">{company}</span>'+
+								'<span class="v-line dib"></span>','');
+				
+			}
+			if(!resultObj.post){
+				var temp = temp.replace('<span class="v-line dib"></span>'+
+								'<span class="position fc-aa dib">{post}</span>','');
+			}
+		}
+
+		var resultObj = firstClassWordHandle(resultObj);
+		console.log(resultObj);
+		app.content = resultObj.contentProblem;
+		app.secondClassification = resultObj.secondClassification;
+		$(".info").append(temp.Format(resultObj));
+
+		var status = resultObj.statusProblem||1;
+		if(helpCount){
+			
+		}
+		app.problemStatus = status;
+		this.statusHandle(status,resultObj,questOwner,questResolveInfo,helpCount);
+	},
+	statusHandle:function(status,resultObj,questOwner,questResolveInfo,helpCount){
+		/*状态相关操作*/
+		$(".g-progress .progress-item").removeClass("active");
+		if(status!=5){
+			for(var i=0;i<status;i++){
+				$(".g-progress .progress-item").eq(i).addClass("active");
+			}
+		}
+		console.log(app.problemStatus)
+		var html = this.getStatusHtml(resultObj,helpCount);
+		$(".handle-status-box").addClass("status"+status).html(html);
+		/*剩余时间*/
+		var lastTime = dateFormat(resultObj.lastTime);
+		if(lastTime.t<0){
+			var limitTime = '';
+		}else{
+			if(lastTime.days>0){
+				var lt = {
+					d:lastTime.days<=0?"":lastTime.days+"天"
+				}
+				var limitTime = "剩余"+lt.d;
+			}else{
+				var lt = {
+					d:lastTime.days<=0?"":lastTime.days+"天",
+					h:lastTime.h<=0?"":lastTime.h+"小时",
+					m:lastTime.m<=0?"":lastTime.m+"分钟"
+				}
+				var limitTime = "剩余"+lt.d+lt.h+lt.m;
+			}
+		}
+		/*剩余时间*/
+		var helpTime = limitTime;
+		$(".help-time").html(helpTime);
+		
+		var footer = this.getFootHtml(resultObj);
+
+		$("footer").html(footer);
+
+		this.resolveInfo(status,app.questId,questResolveInfo,resultObj);
+	},
+	resolveInfo:function(status,questId,questResolveInfo,resultObj){
+		/*有人解决了，显示解决问题情况*/
+		if(status<3||status>4)return false;
+		var result = questResolveInfo;
+
+		result = result[result.length-1];
+		var killeropenid = result.problemWeixinid;
+		app.killeropenid = killeropenid;
+		
+		var temp = this.getResolveInfo(resultObj,killeropenid);
+		var personInfo = getUserInfo(killeropenid);
+		var resultObj = $.extend(personInfo,result);
+
+		personInfo.spareField1==="2" ? resultObj.isV = "v" : resultObj.isV = "";
+		var html = temp.Format(resultObj);
+		console.log(resultObj);
+		$(".resolve-info").append(html);
+		if(!personInfo.company||personInfo.company==""){
+			$(".resolve-info .company,.resolve-info .v-line").hide();
+		}
+		if(!personInfo.post||personInfo.post==""){
+			$(".resolve-info .position,.resolve-info .v-line").hide();
+		}
+		if(!resultObj.spareField4){
+			$(".wechat").remove();
+		}
+
+		/*if(!resultObj.amountMoney||resultObj.amountMoney==''){
+			$(".reward .money").remove();
+		}*/
+		if(status==4){
+			$(".reward .money").show();
+			app.showMoney();
+		}else{
+
+			$(".reward .money").remove();
+		}
+	},
+	getResolveInfo:function(resultObj,killeropenid){
+		console.log(resultObj);
+		var isMySelf = resultObj.questOwner == openid || killeropenid == openid;
+		if(isMySelf){
+			return  '<div class="g-box-item"  data-open="{openid}">'+
+						'<div class="p-info clearfix">'+
+							'<div class="head-wrap {isV}"><img src="{photo}" alt=""></div>'+
+							'<div class="in-wrap">'+
+								'<div class="name">{nickname}</div>'+
+								'<div class="from">'+
+									'<span class="company fc-aa dib">{company}</span>'+
+									'<span class="v-line dib"></span>'+
+									'<span class="position fc-aa dib">{post}</span>'+
+								'</div>'+
+							'</div>'+
+							'<div class="reward"><div class="answer">回答者</div><div class="money"></div></div>'+
+						'</div>'+
+						'<div class="demand">{spareField1}</div>'+
+						'<div class="contact-me">'+
+							'<div class="contact-item wechat">{spareField4}</div>'+
+							'<a class="contact-item phone" href="tel:{mobPhone}">{mobPhone}</div>'+
+						'</div>'+
+					'</div>';
+		}else{
+			return  '<div class="g-box-item"  data-open="{openid}">'+
+						'<div class="p-info clearfix">'+
+							'<div class="head-wrap {isV}"><img src="{photo}" alt=""></div>'+
+							'<div class="in-wrap">'+
+								'<div class="name">{nickname}</div>'+
+								'<div class="from">'+
+									'<span class="company fc-aa dib">{company}</span>'+
+									'<span class="v-line dib"></span>'+
+									'<span class="position fc-aa dib">{post}</span>'+
+								'</div>'+
+							'</div>'+
+							'<div class="reward"><div class="answer">回答者</div><div class="money"></div></div>'+
+						'</div>'+
+					'</div>';
+		}
+		var temp =  '<div class="g-box-item"  data-open="{openid}">'+
+						'<div class="p-info clearfix">'+
+							'<div class="head-wrap {isV}"><img src="{photo}" alt=""></div>'+
+							'<div class="in-wrap">'+
+								'<div class="name">{nickname}</div>'+
+								'<div class="from">'+
+									'<span class="company fc-aa dib">{company}</span>'+
+									'<span class="v-line dib"></span>'+
+									'<span class="position fc-aa dib">{post}</span>'+
+								'</div>'+
+							'</div>'+
+							'<div class="reward">{amountMoney}元</div>'+
+						'</div>'+
+						'<div class="demand">{spareField1}</div>'+
+						'<div class="contact-me">'+
+							'<div class="contact-item wechat">{spareField4}</div>'+
+							'<a class="contact-item phone" href="tel:{mobPhone}">{mobPhone}</div>'+
+						'</div>'+
+					'</div>';
+	},
+	getStatusHtml:function(resultObj,helpCount){
+		/*获取状态html*/
+		var status = resultObj.statusProblem;
+		var awardNum = resultObj.amountMoney;
+		var helpCount = helpCount||0;
+		if(helpCount<1){
+			awardNum = 0;
+		}else{
+			awardNum = awardNum*0.4;
+		}
+		switch(status){
+			case 3:
+			  return '<div class="status-left">等待处理</div><div class="status-right"><div class="help-num"><span class="helpCount">'+helpCount+'</span>个伙伴在帮忙</div><div class="help-time">剩余3小时20分</div></div>';
+			  break;
+			case 4:
+			  return '<div class="status-left">已搞定</div><div class="status-right"><div class="help-num"><span class="helpCount">'+helpCount+'</span>个伙伴平分'+awardNum+'元</div></div>';
+			  break;
+			case 5:
+			  return '<div class="status-left">已过期</div><div class="status-right"><div class="help-num"><span class="helpCount">'+helpCount+'</span>个伙伴已帮忙</div></div>';
+			  break;
+			default:
+			  return '<div class="status-left">等待帮忙</div><div class="status-right"><div class="help-num"><span class="helpCount">'+helpCount+'</span>个伙伴在帮忙</div><div class="help-time">剩余3小时20分</div></div>';
+		}
+	},
+	getFootHtml:function(resultObj){
+		/*获取底部html*/
+
+		/*与后端协商决定问题状态问题*/
+		var t = Date.parse(resultObj.lastTime) - new Date().getTime();
+		if(t<0){
+			var status = 5;
+		}else{
+			var status = resultObj.statusProblem;
+		}
+		
+		var isMySelf = resultObj.questOwner == openid;
+		
+		if(isMySelf){
+			switch(status){
+				case 3:
+					return '<div class="fix-btn"><div class="fix-wrap"><a href="index.html" class="index-btn">首页</a><div class="fix-btn-item btn-highlight undone w30">没搞定</div><div class="fix-btn-item btn-highlight done w30">搞定了</div></div></div>';
+					break;
+				case 4:
+					return '<div class="fix-btn"><div class="fix-wrap"><a href="index.html" class="fix-btn-item btn-highlight">看看其他</a></div></div>';
+					break;
+				case 5:
+					return '<div class="fix-btn"><div class="fix-wrap"><a href="index.html" class="fix-btn-item btn-highlight">看看其他</a></div></div>';
+					break;
+				default:
+					return '<div class="fix-btn"><div class="fix-wrap"><a href="index.html" class="index-btn">首页</a><div class="fix-btn-item btn-highlight share-to-friend login-check find-help">找伙伴帮忙</div></div></div>';
+			}
+		}else{
+			switch(status){
+				case 1:
+					return '<div class="fix-btn"><div class="fix-wrap"><a href="index.html" class="index-btn">首页</a><div class="fix-btn-item btn-highlight share-to-friend w30 login-check find-help">找伙伴帮忙</div><a href="help-resolve.html?questId='+app.questId+'&openidBy='+app.openidBy+'" class="fix-btn-item btn-highlight answer-check login-check w30">我能搞定</a></div></div>';
+					break;
+				case 2:
+					return '<div class="fix-btn"><div class="fix-wrap"><a href="index.html" class="index-btn">首页</a><div class="fix-btn-item btn-highlight share-to-friend w30 login-check find-help">找伙伴帮忙</div><a href="help-resolve.html?questId='+app.questId+'&openidBy='+app.openidBy+'" class="fix-btn-item btn-highligh answer-check login-check w30">我能搞定</a></div></div>';
+					break;
+				case 3:
+					return '<div class="fix-btn"><div class="fix-wrap"><a href="index.html" class="index-btn">首页</a><div class="fix-btn-item share-to-friend btn-highlight w30 login-check find-help">找伙伴帮忙</div><div class="fix-btn-item disabled w30">我能搞定</div></div></div>';
+					break;
+				default:
+					return '<div class="fix-btn"><div class="fix-wrap"><a href="index.html" class="fix-btn-item btn-highlight">看看其他</a></div></div>';
+
+			}
+		}
+	},
+	changeStatus:function(problemStatus){
+		/*改变问题状态*/
+		var questId = app.questId;
+		var url = root_+"/weixin/entry/interfaceEntry.do?paramObject";
+		var data = {
+			busiCode:"updateProStatus",
+			id:questId,
+			problemStatus:problemStatus
+		}
+		new SelfAjax({
+			url:url,
+			data:data,
+			success:function(data){
+				if(data.result.code==1){
+					app.problemStatus = problemStatus;
+					//window.location.href="help-detail.html?questId="+questId
+				}else{
+					showMsg("状态修改失败");
+				}
+			},
+			error:function(){
+
+			}
+		});
+	},
+	changeSolvProblemStatus:function(solvProblemStatus){
+		/*改变解决问题状态*/
+		var url = root_+"/weixin/entry/interfaceEntry.do?paramObject";
+		var data = {
+			busiCode:"updateSolvProStatus",
+			Id:app.questId,
+			problemStatus:solvProblemStatus,
+			openid:app.killeropenid
+		}
+		new SelfAjax({
+			url:url,
+			data:data,
+			success:function(data){
+				if(data.result.code==1){
+					window.location.reload();
+				}else{
+					showMsg("状态修改失败");
+				}
+			},
+			error:function(){
+
+			}
+		});
+	},
+	showMoney:function(){
+		var url = root_+"/weixin/entry/interfaceEntry.do?paramObject";
+		var data = {
+			busiCode:"queryRespondentMoney",
+			openid:app.killeropenid,
+			problemId:app.questId
+		}
+		new SelfAjax({
+			url:url,
+			data:data,
+			success:function(data,status){
+				if(data.result.code==1){
+					$(".reward .money").text(data.resultDesc.count+"元");
+					
+					$(".helpCount").text(data.resultDesc.numberPartake);
+				}
+			}
+		});
+	},
+	checkRegister:function(){
+		var userInfo = getUserInfo(openid);
+		if(!userInfo.mobPhone||userInfo.mobPhone==''){
+			$(".login-dialog").show();
+			$(".login-dialog .head-wrap img").attr("src",userInfo.photo);
+			app.loginInit();
+			return false;
+		}
+		return true;
+	},
+	answerCheck:function(){
+		var url = root_+"/weixin/entry/interfaceEntry.do?paramObject";
+		var data = {
+			busiCode:"verificationProblem",
+			openid:openid,
+			problemId:app.questId
+		}
+		var returnVal = false;
+		new SelfAjax({
+			url:url,
+			data:data,
+			async:false,
+			success:function(data,status){
+				if(data.result.code==1){
+					console.log(data.resultDesc);
+					if(data.resultDesc<3){
+						returnVal = true;
+					}else{
+						returnVal = false;
+					}
+				}else{
+					returnVal = false;
+				}
+				
+			}
+		});
+		return returnVal;
+	},
+	loginInit:function(){
+		var phoneReg = /^1[3|4|5|7|8]\d{9}$/;
+		$(".getcode:not(.disabled)").on("click",function(){
+			var phone = $("#phone").val();
+
+			if(!phoneReg.test(phone)){
+				alert("请输入合法的手机号");
+				return false;
+			}
+			var that = $(this);
+			that.addClass("disabled");
+
+			var url = root_+"/weixin/entrysms/interfaceEntry.do?paramObject=";
+			var phone = $("#phone").val();
+
+			var data={
+				busiCode: 'requestSmsCode',
+				openid: openid,
+				phone:phone
+			}
+
+			new SelfAjax({
+				url:url,
+				data:data,
+				success:function(data){
+					if(data&&data.result.code==1){
+						var timer = countDown();
+					}else{
+						that.removeClass("disabled");
+						clearInterval(timer);
+						alert(data.result.desc);
+					}
+				}
+			});		
+		});
+
+		function countDown(){
+			var start = 60;
+			var timer = setInterval(calc,1000);
+
+			function calc(){
+				var html = "重新发送("+start+")";
+				$(".getcode").html(html);
+				if(start==0){
+					$(".getcode").removeClass("disabled").html("发送验证码");
+					clearInterval(timer);
+					return;
+				}else{
+					start--;
+				}
+			}
+			calc();
+			return timer;
+		}
+
+		var loading = false;
+		$("#submit").on("click",function(){
+			var url = root_+"/weixin/entrysms/interfaceEntry.do";
+			var phone = $("#phone").val();
+			var code  = $("#code").val();
+
+			var data={
+				busiCode: 'testSmsCode',
+				openid: openid,
+				phone:phone,
+				code:code
+			}
+			if(loading){
+				return false;
+			}
+			loading = true;
+			new SelfAjax({
+				url:url,
+				data:data,
+				success:function(data){
+					loading = false;
+					if(data.result.code==1){
+						window.location.reload();
+					}
+				},
+				error:function(){
+					loading = false;
+				}
+			});	
+		});
+	},
+	eventBind:function(){
+		var questId = app.questId;
+
+		$(document).on("click",".done",function(){
+			/*搞定了*/
+			layer.open({
+			    content: '确定问题已经搞定了吗？',
+			    btn: ['是的', '取消'],
+			    yes: function(index){
+					var url = root_+'/weixin/entry/interfaceEntry.do?paramObject';
+					var data = {
+						busiCode:'problemAdopt',
+						id:questId
+					}
+					new SelfAjax({
+						url:url,
+						data:data,
+						success:function(data){
+							if(data.result.code==1){
+								window.location.reload();
+							}
+						},
+						error:function(){
+
+						}
+					});
+					layer.close(index);
+			    }
+			});
+		});
+		$(document).on("click",".undone",function(){
+			/*没搞定*/
+			layer.open({
+			    content: '你的问题还没搞定吗？',
+			    btn: ['是的', '取消'],
+			    yes: function(index){
+					app.changeStatus(2);
+					app.changeSolvProblemStatus(0);
+					window.location.reload();
+					layer.close(index);
+			    }
+			});
+			
+		});
+
+		$(document).on("click",".login-check",function(){
+			var isRegister = app.checkRegister();
+			if(!isRegister){return false;}
+		});
+
+		$(document).on("click",".answer-check",function(){
+			var isRegister = app.checkRegister();
+			if(!isRegister){return false;}
+
+			if(!app.answerCheck()){
+				alert("每人回答问题不得超过三次！");
+				return false;
+			}
+		});
+
+		$(document).on("click",".find-help",function(){
+			var isRegister = app.checkRegister();
+			console.log(isRegister);
+			if(!isRegister){return false;}
+
+			var url = root_+"/weixin/entry/interfaceEntry.do?paramObject";
+			var questInfo = getQuestDetail(app.questId).problemDesc;
+
+			var data={
+				"busiCode":"generateShareImage",
+				"content":questInfo.contentProblem,
+				"money":questInfo.amountMoney,
+				"openid":questInfo.openid,
+				"problemId":app.questId,
+				"className":app.secondClassification
+			}
+			
+			new SelfAjax({
+				url:url,
+				data:data,
+				success:function(data){
+					if(data.result.code==1){
+						$(".share-dialog").show();
+						$(".share-dialog .g-dialog-content").html('<img src='+data.resultDesc+' alt="">');
+						
+						if(app.openidBy!=""){
+							addHelpRecord(app.questId,app.openidBy);
+							app.changeStatus(2);
+							app.dataFormat();
+						}
+						
+					}else{
+						alert(data.result.desc);
+					}
+				},
+				error:function(errorMsg){}
+			});
+		});
+
+		$(document).on("touchstart",".phone",function(){
+			$(this).css("background-color","#EEE");
+		}).on("touchmove",".phone",function(event){
+			event.preventDefault();
+		}).on("touchcancel touchend",".phone",function(event){
+			$(this).css("background-color","#FFF");
+		});
+
+		/*weixin share*/
+		/*wx.config({
+			debug: false,
+			appId : "wx64719d9b69c5714d",
+			timestamp: data[0].timeStamp,
+			nonceStr:  data[0].nonceStr,
+			signature: data[0].signType,
+			jsApiList: [
+				'checkJsApi',
+				'onMenuShareTimeline'
+			]
+		});
+	    wx.onMenuShareAppMessage({
+			title: "[创伙伴·帮忙]#发布人名称##详情二级标签#",
+			desc: "悬赏求助、等你帮忙",
+			link: window.location.url,
+			imgUrl: "/weixin/images/help-logo.jpg",
+			trigger: function (res) {
+				alert('用户点击发送给朋友');
+			},
+			success: function (res) {
+				alert('已分享');
+			},
+			cancel: function (res) {
+				alert('已取消');
+			},
+			fail: function (res) {
+				alert(JSON.stringify(res));
+			}
+	    });*/
+		
+	},
+	init:function(){
+		if(GetRequest().openidBy){
+			app.openidBy = GetRequest().openidBy;
+		}
+
+		if(openid=="undefined"&&GetRequest().shareId){
+			window.openid = GetRequest().shareId;
+			sessionStorage.openid = openid;
+		}
+
+		$("#suggest").attr("href","suggest.html?"+GetRequest(true));
+		this.dataFormat(getQuestDetail(app.questId));
+
+		this.eventBind();
+	}
+}
+$(function(){
+	app.init();
+});
+</script>
+</body>
+</html>

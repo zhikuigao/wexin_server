@@ -1,0 +1,96 @@
+<!doctype html>
+<html>
+ <head> 
+  <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE8,ie=edge"> 
+  <meta charset="UTF-8"> 
+  <title>Full Layout - jQuery EasyUI Demo</title> 
+  <link rel="stylesheet" type="text/css" href="common/widget/jquery/themes/default/easyui.css"> 
+  <link rel="stylesheet" type="text/css" href="common/widget/jquery/themes/icon.css"> 
+  <link rel="stylesheet" type="text/css" href="common/css/demo.css"> 
+  <script type="text/javascript" src="common/widget/jquery/jquery.min.js"></script> 
+  <script type="text/javascript" src="common/widget/jquery/jquery.easyui.min.js"></script> 
+  <script type="text/javascript" src="common/js/public.js"></script> 
+  <script type="text/javascript">
+	// uses jQuery to bind a function to the document.ready event.
+	// $(document).ready(function() { 
+	/* Handler for .ready() called. */
+	// });
+	$(function() {
+		var tabs = $('#tt').tabs().tabs('tabs');
+		for (var i = 0; i < tabs.length; i++) {
+			tabs[i].panel('options').tab.unbind().bind('mouseenter', {
+				title : tabs[i].panel('options').title
+			}, function(e) {
+				$('#tt').tabs('select', e.data.title);
+			});
+		}
+	});
+	function addOperaterMenuTab() {
+		addTab('审核管理', 'operater/operater.html');
+	}
+	function addOperaterMenuUserTab() {
+		addTab('用户管理', 'operater/user.html');
+	}
+	function addRoleMenuTab() {
+		addTab('角色管理', 'operater/role.html');
+	}
+	function addOperaterMenuTabProblem() {
+		addTab('问题管理', 'operater/problem.html');
+	}
+	function logoutTab() {
+		//window.location.href = 'index.html';
+					 $.ajax({
+						url : 'logout.do',
+						success : function(data) {
+						//	alert('111');
+							window.location.href = 'doLogin.html';
+						}
+					});
+	}
+</script> 
+ </head> 
+ <body class="easyui-layout"> 
+  <div data-options="region:'north',border:false" style="height: 10px; background: #B3DFDA; padding: 1px"></div> 
+  <div data-options="region:'west'" title="West" style="width: 150px;"> 
+   <div class="easyui-accordion" data-options="multiple: true" id="myaccrdion"> 
+    <div title="控件使用" data-options="iconCls:'icon-ok'" style="padding: 5px;"> 
+     <div style="padding: 5px; letter-spacing: 4px;"> 
+      <span onclick="addOperaterMenuTab()" style="cursor: pointer">审核管理</span> 
+     </div> 
+      <div style="padding: 5px; letter-spacing: 4px;"> 
+         <span onclick="addOperaterMenuUserTab()" style="cursor: pointer">用户管理</span> 
+     </div> 
+       <div style="padding: 5px; letter-spacing: 4px;"> 
+      <span onclick="addOperaterMenuTabProblem()" style="cursor: pointer">问题管理</span> 
+     </div> 
+     <div style="padding: 5px; letter-spacing: 4px;"> 
+      <span onclick="logoutTab()" style="cursor: pointer">退出系统</span> 
+     </div> 
+    </div> 
+      <!--  <div id="p" class="easyui-panel" title="登   出" style="width: 500px; height: 400px; padding: 10px;"> 
+   <form id="logout_form" class="logout-form" action="/entry/interfaceEntry.do" method="post"> 
+      <table style="margin: 50px 0 0 30px;" cellspacing="30"> 
+       <tbody>
+        <tr>
+         <td><input name="userid" value="123"></td>
+        </tr> 
+        <tr>
+         <td> <input type="submit" name="submit"></td> 
+         <!-- 						<td colspan="2" style="padding: 10px 0px 0px 120px"><a --> 
+         <!-- 							id="logout_submit" href="javascript:void(0)" --> 
+         <!-- 							class="easyui-linkbutton">退出1系统</a></td> 
+        </tr> 
+       </tbody>
+      </table> 
+     </form> 
+    </div> 
+    --> 
+   </div> 
+  </div>    
+  <div data-options="region:'center',title:'Main Title',iconCls:'icon-ok'"> 
+   <div id="tt" class="easyui-tabs" style="width: 700px;" data-options="fit:true,border:false,plain:true"> 
+    <div title="About" data-options="href:'about.html'" style="padding: 10px"></div> 
+   </div> 
+  </div>  
+ </body>
+</html>
